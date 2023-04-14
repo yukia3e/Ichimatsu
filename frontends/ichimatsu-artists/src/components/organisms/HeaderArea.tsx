@@ -1,6 +1,6 @@
 import type { FC, MouseEventHandler } from "react";
-import Button from "../atoms/Button";
-import LogoMolecule from "../molecules/Logo";
+import Button from "@/components/atoms/Button";
+import LogoMolecule from "@/components/molecules/Logo";
 
 type Props = {
   isForTop?: boolean;
@@ -11,7 +11,7 @@ type Props = {
 const HeaderAreaOrganisms: FC<Props> = ({ isForTop, isLoggedIn, logout }) => {
   return (
     <header className="flex flex-wrap items-center justify-between w-full p-2 bg-white drop-shadow">
-      <LogoMolecule isForTop={isForTop} />
+      <LogoMolecule isForTop={isForTop} isLoggedIn={isLoggedIn} />
       {!isLoggedIn ? <></> : <Button onClick={logout}>Sign Out</Button>}
     </header>
   );

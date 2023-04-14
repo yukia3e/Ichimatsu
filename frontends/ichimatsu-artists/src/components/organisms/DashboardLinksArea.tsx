@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import Link from "next/link";
-import SectionTitle from "../atoms/SectionTitle";
+import SectionTitle from "@/components/atoms/SectionTitle";
 
 const DashboardLinksAreaOrganism: FC = () => {
   return (
