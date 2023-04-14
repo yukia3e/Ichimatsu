@@ -29,11 +29,13 @@ const mintSchema = yup.object().shape({
     .positive("Royalty Bps must be a positive number"),
 });
 
-export const useIchimatsuMint = (): [
+export const useIchimatsuMint = (
+  cids: string[]
+): [
   UseFormRegister<mintFormValues>,
   UseFormHandleSubmit<mintFormValues>,
   FieldErrors<mintFormValues>,
-  (cids: string[]) => void
+  () => void
 ] => {
   const {
     register: registerMint,
@@ -42,7 +44,7 @@ export const useIchimatsuMint = (): [
     watch: watchMint,
   } = useForm<mintFormValues>({ resolver: yupResolver(mintSchema) });
 
-  const mint = (cids: string[]) => {
+  const mint = () => {
     const name = watchMint("name");
     const symbol = watchMint("symbol");
     const royaltyRecipient = watchMint("royaltyRecipient");

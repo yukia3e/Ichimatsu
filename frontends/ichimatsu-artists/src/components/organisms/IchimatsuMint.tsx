@@ -29,8 +29,8 @@ const IchimatsuMintOrganism: FC = () => {
     sliceAndPreview,
   ] = useCropper(setSlices);
 
-  const [registerMint, handleSubmitMint, mintErrors, mint] = useIchimatsuMint();
-  const wrappedMint = () => mint(cids);
+  const [registerMint, handleSubmitMint, mintErrors, mint] =
+    useIchimatsuMint(cids);
 
   return (
     <div className="flex flex-col gap-8">
@@ -111,7 +111,7 @@ const IchimatsuMintOrganism: FC = () => {
       )}
       {cids.length > 0 && (
         <div className="container w-full">
-          <form onSubmit={handleSubmitMint(wrappedMint)}>
+          <form onSubmit={handleSubmitMint(mint)}>
             <div>
               <label htmlFor="name">Name</label>
               <input
