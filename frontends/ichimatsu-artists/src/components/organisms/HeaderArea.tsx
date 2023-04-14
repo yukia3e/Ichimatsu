@@ -12,7 +12,7 @@ const HeaderAreaOrganisms: FC<Props> = ({ isForTop, isLoggedIn, logout }) => {
   return (
     <header className="flex flex-wrap items-center justify-between w-full p-2 bg-white drop-shadow">
       <LogoMolecule isForTop={isForTop} />
-      {!isLoggedIn ? <></> : <Button onClick={logout}>ログアウト</Button>}
+      {!isLoggedIn ? <></> : <Button onClick={logout}>Sign Out</Button>}
     </header>
   );
 };
