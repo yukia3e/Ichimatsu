@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import Head from "next/head";
+import IndexEnvironment from "@/components/environments/Index";
 
 const Index: FC = () => {
   return (
@@ -10,7 +11,7 @@ const Index: FC = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      Ichimatsu
+      <IndexEnvironment />
     </>
   );
 };
