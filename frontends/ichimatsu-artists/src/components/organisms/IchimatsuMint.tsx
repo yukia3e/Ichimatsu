@@ -378,8 +378,10 @@ const IchimatsuMintOrganism: FC = () => {
       {/* trxAddress */}
       {txAddress && (
         <div className="container w-full">
-          <span className="font-logo">
-            Minted!! trxAddress: {`${txAddress}`}
+          <span className="font-logo">Minted!!</span>
+          <br />
+          <span className="font-logo text-sm">
+            trxAddress: {`${txAddress}`}
           </span>
         </div>
       )}
