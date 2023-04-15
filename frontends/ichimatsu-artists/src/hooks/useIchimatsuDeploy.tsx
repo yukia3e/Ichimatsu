@@ -57,9 +57,10 @@ export const useIchimatsuDeploy = (): [
       if (!nftContractAddress) throw new Error("nftContractAddress is empty");
 
       setNftContractAddress(nftContractAddress);
-      setIsWaitingDeploy(false);
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsWaitingDeploy(false);
     }
   };
 

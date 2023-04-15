@@ -52,9 +52,10 @@ export const useIchimatsuMint = (
       if (!txAddress) throw new Error("txAddress is empty");
 
       setTxAddress(txAddress);
-      setIsWaitingMint(false);
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsWaitingMint(false);
     }
   };
 
