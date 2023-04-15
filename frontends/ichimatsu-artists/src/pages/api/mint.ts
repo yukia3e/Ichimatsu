@@ -950,7 +950,7 @@ export default async function handler(
     console.log(batchMintTx);
 
     // トランザクションハッシュをレスポンスとして返す
-    res.status(200).json({ txHash: batchMintTx.hash });
+    res.status(200).json({ txAddress: batchMintTx.hash });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Minting failed", error: error });
