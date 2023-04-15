@@ -1,6 +1,6 @@
 export type MintRequestBody = {
   artistAddress: string;
-  baseURI: string;
+  ipfsHash: string;
   nftContractAddress: string;
 };
 

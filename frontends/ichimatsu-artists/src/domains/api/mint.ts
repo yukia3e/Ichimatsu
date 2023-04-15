@@ -6,13 +6,13 @@ import {
 
 const mintNFTs = async (
   artistAddress: string,
-  baseURI: string,
+  ipfsHash: string,
   nftContractAddress: string
 ): Promise<void> => {
   try {
     const body: MintRequestBody = {
       artistAddress,
-      baseURI,
+      ipfsHash,
       nftContractAddress,
     };
     const response = await fetch("/api/mint", {

@@ -1,6 +1,15 @@
-import { URL_PIN_JSON_TO_PINATA } from "@/domains/pinata/constants";
+import PersistentFile from "formidable/PersistentFile";
+import { URL_PIN_FILE_TO_PINATA } from "@/domains/pinata/constants";
+import { ResponsePinJSONToPinata } from "@/domains/pinata/types/response";
+import { getRandomString } from "@/utils/random";
+import * as fs from "async-file";
 import axios from "axios";
+import FormData from "form-data";
+import { IncomingForm } from "formidable";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+const path = require("path");
+const basePathConverter = require("base-path-converter");
 
 export const config = {
   api: {
@@ -19,32 +28,76 @@ const handler = async (
     return;
   }
   if (req.method === "POST") {
-    const pinataContent = req.body; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-
-    const data = JSON.stringify({ pinataContent }); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-
-    const config = {
-      method: "post",
-      url: URL_PIN_JSON_TO_PINATA,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.PINATA_SECRET_JSON}`,
-      },
-      data,
-    };
-
     try {
-      const pinataResponse = await axios(config);
-      res.status(200).json(pinataResponse.data);
+      const form = new IncomingForm();
+      const data = await new Promise<Record<string, any>>((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            reject(err);
+
+            return;
+          }
+          resolve({ fields, files });
+        });
+      });
+
+      const formData = new FormData();
+      const files: PersistentFile & { filepath: string; mimetype: string }[] =
+        Object.values(data.files);
+
+      console.log("-------- files", files);
+
+      let i = 0;
+      const afterPaths: string[] = [];
+      let dirName = "";
+      for (const file of files) {
+        dirName = path.dirname(file.filepath);
+        const beforePath = file.filepath;
+        const afterPath = `${dirName}/${String(i)}`;
+        await fs.rename(beforePath, afterPath);
+
+        afterPaths.push(afterPath);
+        i++;
+      }
+
+      i = 0;
+      for (const afterPath of afterPaths) {
+        const fileStream = fs.createReadStream(afterPath);
+        console.log("------i", i, afterPath);
+        formData.append("file", fileStream, {
+          filepath: basePathConverter(dirName, afterPath),
+          filename: String(i),
+        });
+        i++;
+      }
+
+      const headers = {
+        Authorization: `Bearer ${process.env.PINATA_SECRET_JSON}`,
+        "Content-Type": `multipart/form-data;`,
+        ...formData.getHeaders(),
+      };
+
+      const response = await axios.post<ResponsePinJSONToPinata>(
+        URL_PIN_FILE_TO_PINATA,
+        formData,
+        {
+          headers,
+        }
+      );
+
+      console.log("/api/pin/json is finished!");
+
+      for (const afterPath of afterPaths) {
+        await fs.unlink(afterPath);
+      }
+      res.status(200).json(response.data);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to pin JSON to IPFS" });
+      console.error("Error uploading JSON file:", error);
+      res.status(500).json({ error: "Error uploading JSON file" });
     }
   } else {
-    res.setHeader("Allow", ["POST"]);
-    res
-      .status(405)
-      .json({ message: `Method ${req.method || ""} is not allowed` });
+    res.setHeader("Allow", "POST");
+    res.status(405).end("Method Not Allowed");
   }
 };
 

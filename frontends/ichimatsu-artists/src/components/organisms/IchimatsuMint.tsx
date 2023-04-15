@@ -39,7 +39,7 @@ const IchimatsuMintOrganism: FC = () => {
 
   const [
     isWaitingJSON,
-    baseURI,
+    ipfsHash,
     ipfsJSONErrors,
     uploadJSONsToIPFS,
     registerIPFSJSON,
@@ -47,7 +47,7 @@ const IchimatsuMintOrganism: FC = () => {
   ] = useJSONToIPFS(cids);
 
   const [registerMint, handleSubmitMint, mintErrors, mint] = useIchimatsuMint(
-    baseURI,
+    ipfsHash,
     "artistAddress"
   ); // TODO: artistAddress を本息のものにかえる
 
@@ -187,7 +187,9 @@ const IchimatsuMintOrganism: FC = () => {
               <input
                 id="eventDate"
                 type="text"
-                {...registerIPFSJSON("eventDate")}
+                {...registerIPFSJSON("eventDate", {
+                  required: "EventDate is required",
+                })}
               />
               {ipfsJSONErrors.eventDate && (
                 <span>{ipfsJSONErrors.eventDate.message as string}</span>
@@ -222,7 +224,7 @@ const IchimatsuMintOrganism: FC = () => {
         </div>
       )}
       {/* Mint! */}
-      {baseURI && (
+      {ipfsHash && (
         <div className="container w-full">
           <form onSubmit={handleSubmitMint(mint)}>
             <div>

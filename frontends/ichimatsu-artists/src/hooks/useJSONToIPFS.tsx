@@ -31,7 +31,7 @@ export const useJSONToIPFS = (
   });
 
   const [isWaitingJSON, setIsWaitingJSON] = useState(false);
-  const [baseURI, setBaseURI] = useState<string>("");
+  const [ipfsHash, setIpfsHash] = useState<string>("");
 
   const uploadJSONsToIPFS = async () => {
     const eventName = watchIPFSJSON("eventName");
@@ -43,55 +43,49 @@ export const useJSONToIPFS = (
     const attributes: Attribute[] = [];
     if (eventName)
       attributes.push({ trait_type: "EventName", value: eventName });
-    if (eventDate)
+
+    if (eventDate) {
       attributes.push({
         trait_type: "EventDate",
-        value: eventDate.toDateString(),
+        value: eventDate,
       });
+    }
     if (artistName)
       attributes.push({
         trait_type: "ArtistName",
         value: artistName,
       });
+
     try {
-      const jsonHashes: string[] = [];
+      const metadatas = cids.map((cid, index) => {
+        const metadata: Metadata = {
+          name: `${eventName} #${index}`,
+          description: `${eventName || ""}  ${eventDate || ""} by ${
+            artistName || ""
+          }`,
+          external_link: `ipfs://${cid}`,
+        };
+        if (attributes.length > 0) metadata.attributes = attributes;
 
-      await Promise.all(
-        cids.map((cid, index) => {
-          const metadata: Metadata = {
-            name: `${eventName} #${index}`,
-            description: `${eventName || ""}  ${
-              eventDate?.toDateString() || ""
-            } by ${artistName || ""}`,
-            external_link: `ipfs://${cid}/${index}`,
-          };
-          if (attributes.length > 0) metadata.attributes = attributes;
+        return metadata;
+      });
 
-          return pinJSONToPinata(metadata);
-        })
-      )
-        .then((tmpJSONHashes) => {
-          tmpJSONHashes.map((jsonHash) => {
-            if (!jsonHash) throw "jsonHash is undefined";
-            console.log("jsonHash: ", jsonHash);
-            jsonHashes.push(jsonHash);
-          });
-        })
-        .catch((error) => {
-          throw error;
-        });
-      console.log("アップロード成功:", jsonHashes);
+      const ipfsHash = await pinJSONToPinata(metadatas);
+      if (!ipfsHash) {
+        throw new Error("ipfsHash is undefined, アップロード失敗");
+      }
+      if (ipfsHash) setIpfsHash(ipfsHash);
+      console.log("アップロード成功:", ipfsHash);
     } catch (error) {
       console.error("アップロードエラー:", error);
     } finally {
-      setBaseURI("ipfs://"); // TODO: 正しい情報が設定できるように修正する
       setIsWaitingJSON(false);
     }
   };
 
   return [
     isWaitingJSON,
-    baseURI,
+    ipfsHash,
     ipfsJSONErrors,
     uploadJSONsToIPFS,
     registerIPFSJSON,

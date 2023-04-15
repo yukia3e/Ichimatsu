@@ -11,7 +11,7 @@ import {
 } from "react-hook-form";
 
 export const useIchimatsuMint = (
-  baseURI: string,
+  ipfsHash: string,
   artistAddress: string
 ): [
   UseFormRegister<MintFormSchema>,
@@ -46,7 +46,7 @@ export const useIchimatsuMint = (
       const nftContractAddress = "";
       const _mintRes = await mintNFTs(
         artistAddress,
-        baseURI,
+        ipfsHash,
         nftContractAddress
       );
       // TODO: ここで、mintResの結果をもとに、デプロイ完了を待つ
