@@ -4,11 +4,19 @@ import Link from "next/link";
 type Props = {
   design?: "primary" | "secondary" | "tertiary";
   href?: string;
+  buttonType?: "button" | "submit";
   onClick?: MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
   className?: string;
 } & PropsWithChildren;
 
-const Button: FC<Props> = ({ design, href, onClick, className, children }) => {
+const Button: FC<Props> = ({
+  design,
+  href,
+  buttonType,
+  onClick,
+  className,
+  children,
+}) => {
   let baseClasses = "";
   switch (design) {
     case "primary":
@@ -38,6 +46,17 @@ const Button: FC<Props> = ({ design, href, onClick, className, children }) => {
       >
         {children}
       </Link>
+    );
+  }
+
+  if (buttonType === "submit") {
+    return (
+      <button
+        type="submit"
+        className={`${baseClasses || ""} ${className || ""}`}
+      >
+        {children}
+      </button>
     );
   }
 

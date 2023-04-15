@@ -13,7 +13,8 @@ const HeroAreaOrganism: FC<Props> = ({ isLoggedIn }) => {
             Tagline
           </h2>
           <p className="mt-6 text-lg text-gray-600 leading-8">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa libero
+            &quot;Ichimatsu&quot; is the first step for live music artists to
+            explore new possibilities with web3.
           </p>
         </div>
       </div>

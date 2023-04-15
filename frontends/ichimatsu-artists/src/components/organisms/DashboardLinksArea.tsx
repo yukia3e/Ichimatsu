@@ -4,9 +4,15 @@ import SectionTitle from "@/components/atoms/SectionTitle";
 
 const DashboardLinksAreaOrganism: FC = () => {
   return (
-    <section className="container">
-      <SectionTitle>DashboardLinksAreaOrganism</SectionTitle>
-      <Link href="/mint">Mint</Link>
+    <section className="container flex flex-col mb-20">
+      <div className="w-full text-center">
+        <SectionTitle>Features</SectionTitle>
+      </div>
+      <div className="w-full text-center">
+        <Link href="/mint" className="text-xl text-primary-500">
+          IchimatsuMint
+        </Link>
+      </div>
     </section>
   );
 };
