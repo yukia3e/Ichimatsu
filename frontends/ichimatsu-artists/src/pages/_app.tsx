@@ -10,7 +10,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   const isLoggedIn = provider !== null;
 
   useEffect(() => {
-    if (router.pathname === "/") {
+    if (router.pathname === "/" || router.pathname === "/logo") {
       if (isLoggedIn) {
         router.push("/dashboard"); // eslint-disable-line @typescript-eslint/no-floating-promises
       }

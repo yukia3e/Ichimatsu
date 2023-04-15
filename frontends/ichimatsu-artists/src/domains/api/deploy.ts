@@ -9,7 +9,7 @@ const deployContract = async (
   symbol: string,
   royaltyRecipient?: string,
   royaltyBps?: number
-): Promise<DeployResponse | undefined> => {
+): Promise<string | undefined> => {
   try {
     const body: ConstructorRequestBody = {
       name,
@@ -27,9 +27,8 @@ const deployContract = async (
 
     if (response.ok) {
       const data: DeployResponse = (await response.json()) as DeployResponse;
-      console.log(`Task ID: ${data.taskId}, Status URL: ${data.statusUrl}`);
 
-      return data;
+      return data.contractAddress;
     } else {
       const error: ErrorResponse = (await response.json()) as ErrorResponse;
       console.error(`Error: ${error.error}`);

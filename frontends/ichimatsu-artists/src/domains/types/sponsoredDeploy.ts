@@ -6,7 +6,8 @@ export type ConstructorRequestBody = {
 };
 
 export interface DeployResponse {
-  contractAddress: string;
+  taskId: string;
+  statusUrl: string;
 }
 
 export interface ErrorResponse {

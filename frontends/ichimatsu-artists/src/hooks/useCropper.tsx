@@ -19,6 +19,8 @@ import {
 export const useCropper = (
   setSlices: Dispatch<SetStateAction<string[]>>
 ): [
+  number | null,
+  number | null,
   MutableRefObject<HTMLImageElement | null>,
   number,
   FieldErrors<CropFormSchema>,
@@ -43,8 +45,9 @@ export const useCropper = (
 
   const imageRef = useRef<HTMLImageElement | null>(null);
   const cropperRef = useRef<Cropper | null>(null);
-
   const [croppedImageHoverWidth, setCroppedImageHoverWidth] = useState(0.0);
+  const [cols, setCols] = useState<number | null>(null);
+  const [rows, setRows] = useState<number | null>(null);
 
   const initCropper = () => {
     if (imageRef.current && !cropperRef.current) {
@@ -104,11 +107,15 @@ export const useCropper = (
         }
       }
 
+      setCols(cols);
+      setRows(rows);
       setSlices(newSlices);
     }
   };
 
   return [
+    cols,
+    rows,
     imageRef,
     croppedImageHoverWidth,
     cropErrors,

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import deployContract from "@/domains/api/deploy";
 import { DeployFormSchema, deployFormSchema } from "@/schemas/deloyForm";
+import useSafeAuthStore from "@/stores/useSafeAuthStore";
 import {
   FieldErrors,
   UseFormHandleSubmit,
@@ -17,6 +18,9 @@ export const useIchimatsuDeploy = (): [
   boolean,
   string
 ] => {
+  const safeAuthSignInData = useSafeAuthStore(
+    (state) => state.safeAuthSignInData
+  );
   const [nftContractAddress, setNftContractAddress] = useState<string>("");
   const [isWaitingDeploy, setIsWaitingDeploy] = useState(false);
 
@@ -27,6 +31,12 @@ export const useIchimatsuDeploy = (): [
     watch: watchDeploy,
   } = useForm<DeployFormSchema>({
     resolver: yupResolver(deployFormSchema),
+    defaultValues: {
+      name: "Ichimatsu NFT",
+      symbol: "INF",
+      royaltyRecipient: safeAuthSignInData ? safeAuthSignInData.eoa : "",
+      royaltyBps: 10,
+    },
   });
 
   const deploy = async () => {
@@ -37,15 +47,16 @@ export const useIchimatsuDeploy = (): [
 
     setIsWaitingDeploy(true);
     try {
-      const _deployRes = await deployContract(
+      const nftContractAddress = await deployContract(
         name,
         symbol,
         royaltyRecipient,
         royaltyBps
       );
 
-      // TODO: アドレスの設定
-      setNftContractAddress("");
+      if (!nftContractAddress) throw new Error("nftContractAddress is empty");
+
+      setNftContractAddress(nftContractAddress);
       setIsWaitingDeploy(false);
     } catch (e) {
       console.error(e);

@@ -19,7 +19,8 @@ export type Attribute = {
 };
 
 export type MintResponse = {
-  txAddress: string;
+  taskId: string;
+  statusUrl: string;
 };
 
 export type ErrorResponse = {

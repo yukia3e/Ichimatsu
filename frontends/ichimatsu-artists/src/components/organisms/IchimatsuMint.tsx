@@ -20,6 +20,8 @@ const IchimatsuMintOrganism: FC = () => {
   ] = useImageToIPFS();
 
   const [
+    cols,
+    rows,
     imageRef,
     croppedImageHoverWidth,
     cropErrors,
@@ -58,13 +60,15 @@ const IchimatsuMintOrganism: FC = () => {
 
   const [handleSubmitMint, mint, isWaitingMint, txAddress] = useIchimatsuMint(
     ipfsHash,
-    "artistAddress"
-  ); // TODO: artistAddress を本息のものにかえる
+    nftContractAddress,
+    cols,
+    rows
+  );
 
   return (
     <div className="flex flex-col gap-8">
       {/* Select image file */}
-      <div className="container w-full">
+      <div className="container w-full px-4">
         <input
           {...registerImage("image")}
           type="file"
@@ -87,11 +91,11 @@ const IchimatsuMintOrganism: FC = () => {
           />
           <div>
             <form onSubmit={handleSubmitCrop(sliceAndPreview)}>
-              <div className="mb-4">
+              <div className="mb-4 px-4">
                 <div className="flex flex-row justify-around my-4">
                   <label
                     htmlFor="cols"
-                    className="block text-sm font-medium mx-4 my-auto"
+                    className="block text-sm font-medium mx-4 my-auto w-1/3"
                   >
                     Cols
                   </label>
@@ -114,7 +118,7 @@ const IchimatsuMintOrganism: FC = () => {
                 <div className="flex flex-row justify-around my-4">
                   <label
                     htmlFor="rows"
-                    className="block text-sm font-medium mx-4 my-auto"
+                    className="block text-sm font-medium mx-4 my-auto w-1/3"
                   >
                     Rows
                   </label>
@@ -160,7 +164,7 @@ const IchimatsuMintOrganism: FC = () => {
           </div>
           <div>
             <form onSubmit={handleSubmitIPFS(uploadSlicedImagesToIPFS)}>
-              <Button design="primary" buttonType="submit">
+              <Button design="primary" buttonType="submit" className="my-6">
                 Upload Images to IPFS
               </Button>
             </form>
@@ -177,46 +181,66 @@ const IchimatsuMintOrganism: FC = () => {
       {cids.length > 0 && (
         <div className="container w-full">
           <form onSubmit={handleSubmitMint(mint)}>
-            <div>
-              <label htmlFor="eventName">Event Name</label>
-              <input
-                id="eventName"
-                type="text"
-                {...registerIPFSJSON("eventName", {
-                  required: "EventName is required",
-                })}
-              />
-              {ipfsJSONErrors.eventName && (
-                <span className="text-sm text-red-600 mt-2">
-                  {ipfsJSONErrors.eventName.message as string}
-                </span>
-              )}
-            </div>
-            <div>
-              <label htmlFor="eventDate">Event Date</label>
-              <input
-                id="eventDate"
-                type="text"
-                {...registerIPFSJSON("eventDate", {
-                  required: "EventDate is required",
-                })}
-              />
-              {ipfsJSONErrors.eventDate && (
-                <span>{ipfsJSONErrors.eventDate.message as string}</span>
-              )}
-            </div>
-            <div>
-              <label htmlFor="artistName">Artist Name</label>
-              <input
-                id="artistName"
-                type="text"
-                {...registerIPFSJSON("artistName")}
-              />
-              {ipfsJSONErrors.artistName && (
-                <span className="text-sm text-red-600 mt-2">
-                  {ipfsJSONErrors.artistName.message as string}
-                </span>
-              )}
+            <div className="mb-4 px-4">
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="eventName"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Event Name
+                </label>
+                <input
+                  id="eventName"
+                  type="text"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerIPFSJSON("eventName", {
+                    required: "EventName is required",
+                  })}
+                />
+                {ipfsJSONErrors.eventName && (
+                  <span className="text-sm text-red-600 mt-2">
+                    {ipfsJSONErrors.eventName.message as string}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="eventDate"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Event Date
+                </label>
+                <input
+                  id="eventDate"
+                  type="text"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerIPFSJSON("eventDate", {
+                    required: "EventDate is required",
+                  })}
+                />
+                {ipfsJSONErrors.eventDate && (
+                  <span>{ipfsJSONErrors.eventDate.message as string}</span>
+                )}
+              </div>
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="artistName"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Artist Name
+                </label>
+                <input
+                  id="artistName"
+                  type="text"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerIPFSJSON("artistName")}
+                />
+                {ipfsJSONErrors.artistName && (
+                  <span className="text-sm text-red-600 mt-2">
+                    {ipfsJSONErrors.artistName.message as string}
+                  </span>
+                )}
+              </div>
             </div>
             <Button
               design="primary"
@@ -322,8 +346,9 @@ const IchimatsuMintOrganism: FC = () => {
         </div>
       )}
       {/* trxAddress */}
-      (txAddress &&{" "}
-      {<div className="container w-full">trxAddress: {`${txAddress}`}</div>})
+      {txAddress && (
+        <div className="container w-full">trxAddress: {`${txAddress}`}</div>
+      )}
     </div>
   );
 };

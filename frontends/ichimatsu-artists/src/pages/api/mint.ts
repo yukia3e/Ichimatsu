@@ -1,126 +1,950 @@
-import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
-import { GelatoRelayAdapter } from "@safe-global/relay-kit";
-import {
-  MetaTransactionData,
-  MetaTransactionOptions,
-  OperationType,
-  RelayTransaction,
-} from "@safe-global/safe-core-sdk-types";
-import IchimatsuNFTABIJson from "@/contracts/IchimatsuNFT.sol/IchimatsuNFT.json";
-import { URL_ALCHEMY_NODE_API } from "@/domains/alchemy/constants";
 import { MintRequestBody } from "@/domains/types/mint";
-import hexStringToNumber from "@/utils/hexToNum";
-import { ethers, ContractInterface } from "ethers";
+import { Network } from "alchemy-sdk";
+import { ethers } from "ethers";
 import { NextApiRequest, NextApiResponse } from "next";
+
+const contractABI = [
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_symbol",
+        type: "string",
+      },
+      {
+        internalType: "address",
+        name: "_royaltyRecipient",
+        type: "address",
+      },
+      {
+        internalType: "uint128",
+        name: "_royaltyBps",
+        type: "uint128",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    inputs: [],
+    name: "ApprovalCallerNotOwnerNorApproved",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ApprovalQueryForNonexistentToken",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ApprovalToCurrentOwner",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ApproveToCaller",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "BalanceQueryForZeroAddress",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "MintToZeroAddress",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "MintZeroQuantity",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+    ],
+    name: "OperatorNotAllowed",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "OwnerQueryForNonexistentToken",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "TransferCallerNotOwnerNorApproved",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "TransferFromIncorrectOwner",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "TransferToNonERC721ReceiverImplementer",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "TransferToZeroAddress",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "URIQueryForNonexistentToken",
+    type: "error",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "approved",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "Approval",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "approved",
+        type: "bool",
+      },
+    ],
+    name: "ApprovalForAll",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "string",
+        name: "prevURI",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "newURI",
+        type: "string",
+      },
+    ],
+    name: "ContractURIUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newRoyaltyRecipient",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newRoyaltyBps",
+        type: "uint256",
+      },
+    ],
+    name: "DefaultRoyalty",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "restriction",
+        type: "bool",
+      },
+    ],
+    name: "OperatorRestriction",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "prevOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnerUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "royaltyRecipient",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "royaltyBps",
+        type: "uint256",
+      },
+    ],
+    name: "RoyaltyForToken",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "Transfer",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "OPERATOR_FILTER_REGISTRY",
+    outputs: [
+      {
+        internalType: "contract IOperatorFilterRegistry",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "approve",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "balanceOf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_quantity",
+        type: "uint256",
+      },
+      {
+        internalType: "string",
+        name: "_baseURI",
+        type: "string",
+      },
+      {
+        internalType: "bytes",
+        name: "_data",
+        type: "bytes",
+      },
+    ],
+    name: "batchMintTo",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "burn",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "contractURI",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getApproved",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getBaseURICount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
+    name: "getBatchIdAtIndex",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getDefaultRoyaltyInfo",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint16",
+        name: "",
+        type: "uint16",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getRoyaltyInfoForToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint16",
+        name: "",
+        type: "uint16",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+    ],
+    name: "isApprovedForAll",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_operator",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "isApprovedOrOwner",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "isApprovedOrOwnerOf",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "_tokenURI",
+        type: "string",
+      },
+    ],
+    name: "mintTo",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes[]",
+        name: "data",
+        type: "bytes[]",
+      },
+    ],
+    name: "multicall",
+    outputs: [
+      {
+        internalType: "bytes[]",
+        name: "results",
+        type: "bytes[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "nextTokenIdToMint",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "operatorRestriction",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "ownerOf",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "salePrice",
+        type: "uint256",
+      },
+    ],
+    name: "royaltyInfo",
+    outputs: [
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "royaltyAmount",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "safeTransferFrom",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
+    ],
+    name: "safeTransferFrom",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "approved",
+        type: "bool",
+      },
+    ],
+    name: "setApprovalForAll",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_uri",
+        type: "string",
+      },
+    ],
+    name: "setContractURI",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_royaltyRecipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_royaltyBps",
+        type: "uint256",
+      },
+    ],
+    name: "setDefaultRoyaltyInfo",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bool",
+        name: "_restriction",
+        type: "bool",
+      },
+    ],
+    name: "setOperatorRestriction",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_newOwner",
+        type: "address",
+      },
+    ],
+    name: "setOwner",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_bps",
+        type: "uint256",
+      },
+    ],
+    name: "setRoyaltyInfoForToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "symbol",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "tokenURI",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "transferFrom",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  if (process.env.SAFE_SPONSOR_ACCOUNT_PROXY_ADDRESS === undefined) {
-    throw new Error("SAFE_SPONSOR_ACCOUNT_PROXY_ADDRESS is undefined");
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
+
   if (process.env.NEXT_PUBLIC_CHAIN_ID === undefined) {
     throw new Error("NEXT_PUBLIC_CHAIN_ID is undefined");
   }
-
-  const RPC_URL = URL_ALCHEMY_NODE_API;
-  const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-  const sponsoredSafeSigner = new ethers.Wallet(
-    "", //TODO: 存在しない、safeである必要あり
-    provider
-  );
-  const sponsorSafeProxyAddress =
-    process.env.SAFE_SPONSOR_ACCOUNT_PROXY_ADDRESS; // Safe from which the transaction will be sent. Replace with your Safe address
-  const chainId = hexStringToNumber(process.env.NEXT_PUBLIC_CHAIN_ID);
-
-  // Get Gelato Relay API Key: https://relay.gelato.network/
-  const GELATO_RELAY_API_KEY = process.env.GELATO_RELAY_API_KEY;
-
-  // Usually a limit of 21000 is used but for smart contract interactions, you can increase to 100000 because of the more complex interactions.
-  const gasLimit = "100000";
-
-  // Get the artist's address and mint information from the request
-  const { artistAddress, metadatas, nftContractAddress } =
-    req.body as MintRequestBody;
-
-  // Create a contract instance for your NFT contract
-  const IchimatsuNFTABI = IchimatsuNFTABIJson as unknown as ContractInterface;
-  const nftContract = new ethers.Contract(
-    nftContractAddress,
-    IchimatsuNFTABI,
-    provider
-  );
-
-  // Encode the mint function call with the appropriate arguments
-  const data = nftContract.interface.encodeFunctionData("batchMintTo", [
-    artistAddress,
-    metadatas,
-  ]);
-
-  const safeTransactionData: MetaTransactionData = {
-    to: nftContractAddress,
-    data: data,
-    value: "0",
-    operation: OperationType.Call,
-  };
-  const options: MetaTransactionOptions = {
-    gasLimit: ethers.BigNumber.from(gasLimit),
-    isSponsored: true,
-  };
-
-  async function relayTransaction() {
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: sponsoredSafeSigner,
-    });
-
-    const safeSDK = await Safe.create({
-      ethAdapter,
-      safeAddress: sponsorSafeProxyAddress,
-    });
-
-    const relayAdapter = new GelatoRelayAdapter(GELATO_RELAY_API_KEY);
-
-    const safeTransaction = await safeSDK.createTransaction({
-      safeTransactionData,
-    });
-
-    const signedSafeTx = await safeSDK.signTransaction(safeTransaction);
-
-    const encodedTx = safeSDK
-      .getContractManager()
-      .safeContract.encode("execTransaction", [
-        signedSafeTx.data.to,
-        signedSafeTx.data.value,
-        signedSafeTx.data.data,
-        signedSafeTx.data.operation,
-        signedSafeTx.data.safeTxGas,
-        signedSafeTx.data.baseGas,
-        signedSafeTx.data.gasPrice,
-        signedSafeTx.data.gasToken,
-        signedSafeTx.data.refundReceiver,
-        signedSafeTx.encodedSignatures(),
-      ]);
-
-    const relayTransaction: RelayTransaction = {
-      target: sponsorSafeProxyAddress,
-      encodedTransaction: encodedTx,
-      chainId: chainId,
-      options,
-    };
-    const response = await relayAdapter.relayTransaction(relayTransaction);
-
-    return response;
+  if (process.env.ALCHEMY_API_KEY === undefined) {
+    throw new Error("ALCHEMY_API_KEY is undefined");
+  }
+  if (process.env.ICHIMATSU_PRIVATE_KEY === undefined) {
+    throw new Error("ALCHEMY_API_KEY is undefined");
   }
 
   try {
-    const response = await relayTransaction();
-    res.status(200).json({
-      taskId: response.taskId,
-      statusUrl: `https://relay.gelato.digital/tasks/status/${response.taskId}`,
-    });
+    const { contractAddress, to, quantity, baseURI, data } =
+      req.body as MintRequestBody; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+
+    const provider = new ethers.providers.AlchemyProvider(
+      Network.MATIC_MUMBAI,
+      process.env.ALCHEMY_API_KEY
+    );
+
+    const signer = new ethers.Wallet(
+      process.env.ICHIMATSU_PRIVATE_KEY,
+      provider
+    );
+
+    const contractInstance = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      signer
+    );
+
+    const batchMintTx = await contractInstance.batchMintTo(
+      to,
+      quantity,
+      baseURI,
+      data
+    );
+    await batchMintTx.wait();
+
+    // トランザクションハッシュをレスポンスとして返す
+    res.status(200).json({ txHash: batchMintTx.hash });
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ message: "Minting failed", error: error });
   }
 }
