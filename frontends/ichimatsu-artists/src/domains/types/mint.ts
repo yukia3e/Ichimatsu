@@ -1,14 +1,19 @@
 export type MintRequestBody = {
   artistAddress: string;
-  metadatas: Metadata[];
+  baseURI: string;
   nftContractAddress: string;
 };
 
 export type Metadata = {
   name: string;
   description: string;
-  image: string;
-  // ... Any other metadata you want to include
+  external_link: string;
+  attributes?: Attribute[];
+};
+
+export type Attribute = {
+  trait_type: string;
+  value: string;
 };
 
 export type MintResponse = {

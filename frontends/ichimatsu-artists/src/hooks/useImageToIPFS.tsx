@@ -1,21 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { pinFileToPinata } from "@/domains/api/pinFIleToPinata";
-import { ipfsFormSchema } from "@/schemas/ipfsForm";
-import type { IPFSFormSchema } from "@/schemas/ipfsForm";
-import {
-  FieldErrors,
-  UseFormHandleSubmit,
-  UseFormRegister,
-  useForm,
-} from "react-hook-form";
+import { pinImageToPinata } from "@/domains/api/pinImageToPinata";
+import type { IPFSImageFormSchema } from "@/schemas/ipfsImageForm";
+import { UseFormHandleSubmit, useForm } from "react-hook-form";
 
-export const useIPFS = (): [
+export const useImageToIPFS = (): [
   boolean,
   string[],
-  UseFormRegister<IPFSFormSchema>,
-  UseFormHandleSubmit<IPFSFormSchema>,
-  FieldErrors<IPFSFormSchema>,
+  UseFormHandleSubmit<IPFSImageFormSchema>,
   () => Promise<void>,
   string[],
   Dispatch<SetStateAction<string[]>>
@@ -24,25 +15,15 @@ export const useIPFS = (): [
   const [cids, setCids] = useState<string[]>([]);
   const [isWaiting, setIsWaiting] = useState(false);
 
-  const {
-    register: registerIPFS,
-    handleSubmit: handleSubmitIPFS,
-    formState: { errors: ipfsErrors },
-    watch: watchIPFS,
-  } = useForm<IPFSFormSchema>({
-    resolver: yupResolver(ipfsFormSchema),
-  });
+  const { handleSubmit: handleSubmitIPFS } = useForm<IPFSImageFormSchema>({});
 
   const uploadSlicedImagesToIPFS = async () => {
     setIsWaiting(true);
 
-    const name = watchIPFS("name");
-    const cidVersion = watchIPFS("cidVersion");
-
     try {
       const cids: string[] = [];
       await Promise.all(
-        slices.map((slice) => pinFileToPinata(slice, name, cidVersion))
+        slices.map((slice, index) => pinImageToPinata(slice, index))
       )
         .then((tmpCIDs) => {
           tmpCIDs.map((cid) => {
@@ -66,9 +47,7 @@ export const useIPFS = (): [
   return [
     isWaiting,
     cids,
-    registerIPFS,
     handleSubmitIPFS,
-    ipfsErrors,
     uploadSlicedImagesToIPFS,
     slices,
     setSlices,

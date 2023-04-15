@@ -1,19 +1,18 @@
 import {
   ErrorResponse,
-  Metadata,
   MintRequestBody,
   MintResponse,
 } from "@/domains/types/mint";
 
 const mintNFTs = async (
   artistAddress: string,
-  metadatas: Metadata[],
+  baseURI: string,
   nftContractAddress: string
 ): Promise<void> => {
   try {
     const body: MintRequestBody = {
       artistAddress,
-      metadatas,
+      baseURI,
       nftContractAddress,
     };
     const response = await fetch("/api/mint", {

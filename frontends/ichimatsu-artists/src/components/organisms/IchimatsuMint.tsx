@@ -1,9 +1,10 @@
 import type { FC } from "react";
 import Button from "@/components/atoms/Button";
 import { useCropper } from "@/hooks/useCropper";
-import { useIPFS } from "@/hooks/useIPFS";
 import { useIchimatsuMint } from "@/hooks/useIchimatsuMint";
+import { useImageToIPFS } from "@/hooks/useImageToIPFS";
 import "cropperjs/dist/cropper.min.css";
+import { useJSONToIPFS } from "@/hooks/useJSONToIPFS";
 import { useImageSelector } from "@/hooks/userImageSelector";
 import range from "@/utils/range";
 
@@ -11,13 +12,11 @@ const IchimatsuMintOrganism: FC = () => {
   const [
     isWaiting,
     cids,
-    registerIPFS,
     handleSubmitIPFS,
-    ipfsErrors,
     uploadSlicedImagesToIPFS,
     slices,
     setSlices,
-  ] = useIPFS();
+  ] = useImageToIPFS();
 
   const [
     imageRef,
@@ -38,8 +37,19 @@ const IchimatsuMintOrganism: FC = () => {
     handleSubmitImage,
   ] = useImageSelector(imageRef, initCropper, destroyCropper);
 
-  const [registerMint, handleSubmitMint, mintErrors, mint] =
-    useIchimatsuMint(cids);
+  const [
+    isWaitingJSON,
+    baseURI,
+    ipfsJSONErrors,
+    uploadJSONsToIPFS,
+    registerIPFSJSON,
+    handleSubmitJPFSJSON,
+  ] = useJSONToIPFS(cids);
+
+  const [registerMint, handleSubmitMint, mintErrors, mint] = useIchimatsuMint(
+    baseURI,
+    "artistAddress"
+  ); // TODO: artistAddress を本息のものにかえる
 
   return (
     <div className="flex flex-col gap-8">
@@ -123,7 +133,7 @@ const IchimatsuMintOrganism: FC = () => {
           </div>
         </div>
       )}
-      {/* upload to IPFS */}
+      {/* upload images to IPFS */}
       {slices.length > 0 && (
         <div className="container w-full">
           {/* TODO: gapについて、col=17以降になると、lg以上で画面が破綻する */}
@@ -140,26 +150,8 @@ const IchimatsuMintOrganism: FC = () => {
           </div>
           <div>
             <form onSubmit={handleSubmitIPFS(uploadSlicedImagesToIPFS)}>
-              <div>
-                <label htmlFor="name">Name</label>
-                <input id="name" type="text" {...registerIPFS("name")} />
-                {ipfsErrors.name && (
-                  <span className="text-sm text-red-600 mt-2">
-                    {ipfsErrors.name.message as string}
-                  </span>
-                )}
-              </div>
-              <div>
-                <label htmlFor="cidVersion">CID Version</label>
-                <input id="name" type="text" {...registerIPFS("cidVersion")} />
-                {ipfsErrors.name && (
-                  <span className="text-sm text-red-600 mt-2">
-                    {ipfsErrors.name.message as string}
-                  </span>
-                )}
-              </div>
               <Button design="primary" buttonType="submit">
-                Upload to IPFS
+                Upload Images to IPFS
               </Button>
             </form>
           </div>
@@ -171,8 +163,66 @@ const IchimatsuMintOrganism: FC = () => {
           <div className="bg-white w-16 h-16 rounded-full border-t-4 border-blue-500 animate-spin ease-linear"></div>
         </div>
       )}
-      {/* Mint! */}
+      {/* upload JSON to IPFS */}
       {cids.length > 0 && (
+        <div className="container w-full">
+          <form onSubmit={handleSubmitMint(mint)}>
+            <div>
+              <label htmlFor="eventName">Event Name</label>
+              <input
+                id="eventName"
+                type="text"
+                {...registerIPFSJSON("eventName", {
+                  required: "EventName is required",
+                })}
+              />
+              {ipfsJSONErrors.eventName && (
+                <span className="text-sm text-red-600 mt-2">
+                  {ipfsJSONErrors.eventName.message as string}
+                </span>
+              )}
+            </div>
+            <div>
+              <label htmlFor="eventDate">Event Date</label>
+              <input
+                id="eventDate"
+                type="text"
+                {...registerIPFSJSON("eventDate")}
+              />
+              {ipfsJSONErrors.eventDate && (
+                <span>{ipfsJSONErrors.eventDate.message as string}</span>
+              )}
+            </div>
+            <div>
+              <label htmlFor="artistName">Artist Name</label>
+              <input
+                id="artistName"
+                type="text"
+                {...registerIPFSJSON("artistName")}
+              />
+              {ipfsJSONErrors.artistName && (
+                <span className="text-sm text-red-600 mt-2">
+                  {ipfsJSONErrors.artistName.message as string}
+                </span>
+              )}
+            </div>
+            <Button
+              design="primary"
+              onClick={handleSubmitJPFSJSON(uploadJSONsToIPFS)}
+            >
+              Upload JSON to IPFS
+            </Button>
+          </form>
+        </div>
+      )}
+      {/* Loading indicator */}
+      {isWaitingJSON && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white w-16 h-16 rounded-full border-t-4 border-blue-500 animate-spin ease-linear"></div>
+        </div>
+      )}
+      {/* Mint! */}
+      {baseURI && (
         <div className="container w-full">
           <form onSubmit={handleSubmitMint(mint)}>
             <div>

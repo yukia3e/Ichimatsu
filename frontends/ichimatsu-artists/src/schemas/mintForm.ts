@@ -2,7 +2,6 @@ import * as yup from "yup";
 import type { InferType } from "yup";
 
 export const mintFormSchema = yup.object().shape({
-  image: yup.mixed().required("Image is required"),
   name: yup.string().required("Name is required"),
   symbol: yup.string().required("Symbol is required"),
   royaltyRecipient: yup

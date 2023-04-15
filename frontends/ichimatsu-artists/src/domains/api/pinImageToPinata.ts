@@ -1,11 +1,10 @@
-import { ResponsePinFileToPinata } from "@/domains/pinata/types/response";
+import { ResponsePinImageToPinata } from "@/domains/pinata/types/response";
 import axios from "axios";
-import { API_PATH_PIN_FILE_TO_PINATA } from "../constants";
+import { API_PATH_PIN_IMAGE_TO_PINATA } from "../constants";
 
-export const pinFileToPinata = async (
+export const pinImageToPinata = async (
   dataurl: string,
-  name: string | undefined,
-  cidVersion: number | undefined
+  index: number
 ): Promise<string | undefined> => {
   if (process.env.NEXT_PUBLIC_API_ENDPOINT === undefined) {
     throw new Error("NEXT_PUBLIC_API_ENDPOINT is undefined");
@@ -19,23 +18,14 @@ export const pinFileToPinata = async (
   const formData = new FormData();
   formData.append("file", blob);
 
-  if (!name) {
-    const metadata = JSON.stringify({
-      name,
-    });
-    formData.append("pinataMetadata", metadata);
-  }
-
-  if (!cidVersion) {
-    const options = JSON.stringify({
-      cidVersion,
-    });
-    formData.append("pinataOptions", options);
-  }
+  const metadata = JSON.stringify({
+    name: `${index}`,
+  });
+  formData.append("pinataMetadata", metadata);
 
   try {
-    const response = await axios.post<ResponsePinFileToPinata>(
-      `${process.env.NEXT_PUBLIC_API_ENDPOINT}${API_PATH_PIN_FILE_TO_PINATA}`,
+    const response = await axios.post<ResponsePinImageToPinata>(
+      `${process.env.NEXT_PUBLIC_API_ENDPOINT}${API_PATH_PIN_IMAGE_TO_PINATA}`,
       formData,
       {
         headers: {

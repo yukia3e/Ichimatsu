@@ -1,6 +1,6 @@
 import fs from "fs";
 import { URL_PIN_FILE_TO_PINATA } from "@/domains/pinata/constants";
-import { ResponsePinFileToPinata } from "@/domains/pinata/types/response";
+import { ResponsePinImageToPinata } from "@/domains/pinata/types/response";
 import axios from "axios";
 import FormData from "form-data";
 import { IncomingForm } from "formidable";
@@ -16,7 +16,7 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> => {
-  console.log("/api/pin is called!");
+  console.log("/api/pin/image is called!");
   if (process.env.PINATA_SECRET_JSON === undefined) {
     res.status(500).json({ error: "PINATA_SECRET_JSON not defined" });
 
@@ -53,7 +53,7 @@ const handler = async (
         ...formData.getHeaders(),
       };
 
-      const response = await axios.post<ResponsePinFileToPinata>(
+      const response = await axios.post<ResponsePinImageToPinata>(
         URL_PIN_FILE_TO_PINATA,
         formData,
         {
@@ -61,7 +61,7 @@ const handler = async (
         }
       );
 
-      console.log("/api/pin is finished!");
+      console.log("/api/pin/image is finished!");
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
       fs.unlink(file.filepath, (err) => {
         if (err) {
