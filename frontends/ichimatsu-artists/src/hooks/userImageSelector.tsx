@@ -40,7 +40,7 @@ export const useImageSelector = (
     return () => {
       destroyCropper();
     };
-  }, [imageSource]);
+  }, [imageSource]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const readImageFile: SubmitHandler<FieldValues> = (data, event) => {
     if (event) {

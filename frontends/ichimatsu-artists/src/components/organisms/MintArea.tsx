@@ -1,14 +1,14 @@
 import type { FC } from "react";
-import Title from "@/components/atoms/Title";
+import SectionTitle from "../atoms/SectionTitle";
 import IchimatsuMintEcosystem from "../ecosystems/IchimatsuMint";
 
-const MintOrganism: FC = () => {
+const MintAreaOrganism: FC = () => {
   return (
     <section className="container">
-      <Title>Ichimatsu Mint</Title>
+      <SectionTitle>IchimatsuMint</SectionTitle>
       <IchimatsuMintEcosystem />
     </section>
   );
 };
 
-export default MintOrganism;
+export default MintAreaOrganism;

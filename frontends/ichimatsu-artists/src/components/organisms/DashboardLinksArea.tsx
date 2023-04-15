@@ -5,7 +5,7 @@ import SectionTitle from "@/components/atoms/SectionTitle";
 const DashboardLinksAreaOrganism: FC = () => {
   return (
     <section className="container">
-      <SectionTitle>DashboardLinksAreaOrganism</SectionTitle>
+      <SectionTitle>Links</SectionTitle>
       <Link href="/mint">Mint</Link>
     </section>
   );
