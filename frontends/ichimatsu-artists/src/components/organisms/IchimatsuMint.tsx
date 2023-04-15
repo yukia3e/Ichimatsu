@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import Button from "@/components/atoms/Button";
 import { useCropper } from "@/hooks/useCropper";
+import { useIchimatsuDeploy } from "@/hooks/useIchimatsuDeploy";
 import { useIchimatsuMint } from "@/hooks/useIchimatsuMint";
 import { useImageToIPFS } from "@/hooks/useImageToIPFS";
 import "cropperjs/dist/cropper.min.css";
@@ -46,7 +47,16 @@ const IchimatsuMintOrganism: FC = () => {
     handleSubmitJPFSJSON,
   ] = useJSONToIPFS(cids);
 
-  const [registerMint, handleSubmitMint, mintErrors, mint] = useIchimatsuMint(
+  const [
+    registerDeploy,
+    handleSubmitDeploy,
+    deployErrors,
+    deploy,
+    isWaitingDeploy,
+    nftContractAddress,
+  ] = useIchimatsuDeploy();
+
+  const [handleSubmitMint, mint, isWaitingMint, txAddress] = useIchimatsuMint(
     ipfsHash,
     "artistAddress"
   ); // TODO: artistAddress を本息のものにかえる
@@ -223,20 +233,20 @@ const IchimatsuMintOrganism: FC = () => {
           <div className="bg-white w-16 h-16 rounded-full border-t-4 border-blue-500 animate-spin ease-linear"></div>
         </div>
       )}
-      {/* Mint! */}
+      {/* Deploy! */}
       {ipfsHash && (
         <div className="container w-full">
-          <form onSubmit={handleSubmitMint(mint)}>
+          <form onSubmit={handleSubmitDeploy(deploy)}>
             <div>
               <label htmlFor="name">Name</label>
               <input
                 id="name"
                 type="text"
-                {...registerMint("name", { required: "Name is required" })}
+                {...registerDeploy("name", { required: "Name is required" })}
               />
-              {mintErrors.name && (
+              {deployErrors.name && (
                 <span className="text-sm text-red-600 mt-2">
-                  {mintErrors.name.message as string}
+                  {deployErrors.name.message as string}
                 </span>
               )}
             </div>
@@ -245,10 +255,12 @@ const IchimatsuMintOrganism: FC = () => {
               <input
                 id="symbol"
                 type="text"
-                {...registerMint("symbol", { required: "Symbol is required" })}
+                {...registerDeploy("symbol", {
+                  required: "Symbol is required",
+                })}
               />
-              {mintErrors.symbol && (
-                <span>{mintErrors.symbol.message as string}</span>
+              {deployErrors.symbol && (
+                <span>{deployErrors.symbol.message as string}</span>
               )}
             </div>
             <div>
@@ -256,13 +268,13 @@ const IchimatsuMintOrganism: FC = () => {
               <input
                 id="royaltyRecipient"
                 type="text"
-                {...registerMint("royaltyRecipient", {
+                {...registerDeploy("royaltyRecipient", {
                   required: "Royalty Recipient is required",
                 })}
               />
-              {mintErrors.royaltyRecipient && (
+              {deployErrors.royaltyRecipient && (
                 <span className="text-sm text-red-600 mt-2">
-                  {mintErrors.royaltyRecipient.message as string}
+                  {deployErrors.royaltyRecipient.message as string}
                 </span>
               )}
             </div>
@@ -271,22 +283,47 @@ const IchimatsuMintOrganism: FC = () => {
               <input
                 id="royaltyBps"
                 type="number"
-                {...registerMint("royaltyBps", {
+                {...registerDeploy("royaltyBps", {
                   required: "Royalty Bps is required",
                 })}
               />
-              {mintErrors.royaltyBps && (
+              {deployErrors.royaltyBps && (
                 <span className="text-sm text-red-600 mt-2">
-                  {mintErrors.royaltyBps.message as string}
+                  {deployErrors.royaltyBps.message as string}
                 </span>
               )}
             </div>
+            <Button design="primary" buttonType="submit">
+              Deploy NFT Contract
+            </Button>
+          </form>
+        </div>
+      )}
+      {/* Loading indicator */}
+      {isWaitingDeploy && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white w-16 h-16 rounded-full border-t-4 border-blue-500 animate-spin ease-linear"></div>
+        </div>
+      )}
+      {/* Mint! */}
+      {nftContractAddress && (
+        <div className="container w-full">
+          <form onSubmit={handleSubmitMint(mint)}>
             <Button design="primary" buttonType="submit">
               Mint NFT
             </Button>
           </form>
         </div>
       )}
+      {/* Loading indicator */}
+      {isWaitingMint && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white w-16 h-16 rounded-full border-t-4 border-blue-500 animate-spin ease-linear"></div>
+        </div>
+      )}
+      {/* trxAddress */}
+      (txAddress &&{" "}
+      {<div className="container w-full">trxAddress: {`${txAddress}`}</div>})
     </div>
   );
 };
