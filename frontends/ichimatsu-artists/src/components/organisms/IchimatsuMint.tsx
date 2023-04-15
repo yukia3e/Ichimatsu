@@ -1,12 +1,15 @@
 import type { FC } from "react";
+import Button from "@/components/atoms/Button";
 import { useCropper } from "@/hooks/useCropper";
 import { useIPFS } from "@/hooks/useIPFS";
 import { useIchimatsuMint } from "@/hooks/useIchimatsuMint";
 import "cropperjs/dist/cropper.min.css";
 import { useImageSelector } from "@/hooks/userImageSelector";
+import range from "@/utils/range";
 
 const IchimatsuMintOrganism: FC = () => {
   const [
+    isWaiting,
     cids,
     registerIPFS,
     handleSubmitIPFS,
@@ -40,19 +43,22 @@ const IchimatsuMintOrganism: FC = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
+      {/* Select image file */}
+      <div className="container w-full">
         <input
           {...registerImage("image")}
           type="file"
           accept="image/*"
           onChange={handleSubmitImage(readImageFile)}
+          className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
         />
         {imageErrors.image && (
           <span>{imageErrors.image.message as string}</span>
         )}
       </div>
+      {/* Crop and Preview */}
       {imageSource && (
-        <div>
+        <div className="container w-full">
           <img
             ref={imageRef}
             src={imageSource as string}
@@ -61,25 +67,63 @@ const IchimatsuMintOrganism: FC = () => {
           />
           <div>
             <form onSubmit={handleSubmitCrop(sliceAndPreview)}>
-              <div>
-                <label htmlFor="cols">Cols</label>
-                <input id="cols" type="text" {...registerCrop("cols")} />
+              <div className="mb-4">
+                <div className="flex flex-row justify-around my-4">
+                  <label
+                    htmlFor="cols"
+                    className="block text-sm font-medium mx-4 my-auto"
+                  >
+                    Cols
+                  </label>
+                  <select
+                    {...registerCrop("cols")}
+                    className="py-3 px-4 pr-9 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    {range(1, 20).map((i) => (
+                      <option key={i} value={i}>
+                        {i}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {cropErrors.cols && (
-                  <span>{cropErrors.cols.message as string}</span>
+                  <span className="text-sm text-red-600 mt-2">
+                    {cropErrors.cols.message as string}
+                  </span>
                 )}
+                <div className="flex flex-row justify-around my-4">
+                  <label
+                    htmlFor="rows"
+                    className="block text-sm font-medium mx-4 my-auto"
+                  >
+                    Rows
+                  </label>
+                  <select
+                    {...registerCrop("rows")}
+                    className="py-3 px-4 pr-9 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    {range(1, 20).map((i) => (
+                      <option key={i} value={i}>
+                        {i}
+                      </option>
+                    ))}
+                  </select>
+                  {cropErrors.rows && (
+                    <span className="text-sm text-red-600 mt-2">
+                      {cropErrors.rows.message as string}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div>
-                <label htmlFor="rows">Rows</label>
-                <input id="rows" type="text" {...registerCrop("rows")} />
-                {cropErrors.rows && (
-                  <span>{cropErrors.rows.message as string}</span>
-                )}
-              </div>
-              <button type="submit">分割してプレビュー</button>
+
+              <Button design="primary" buttonType="submit">
+                Split and preview
+              </Button>
             </form>
           </div>
         </div>
       )}
+      {/* upload to IPFS */}
       {slices.length > 0 && (
         <div className="container w-full">
           {/* TODO: gapについて、col=17以降になると、lg以上で画面が破綻する */}
@@ -100,21 +144,34 @@ const IchimatsuMintOrganism: FC = () => {
                 <label htmlFor="name">Name</label>
                 <input id="name" type="text" {...registerIPFS("name")} />
                 {ipfsErrors.name && (
-                  <span>{ipfsErrors.name.message as string}</span>
+                  <span className="text-sm text-red-600 mt-2">
+                    {ipfsErrors.name.message as string}
+                  </span>
                 )}
               </div>
               <div>
                 <label htmlFor="cidVersion">CID Version</label>
                 <input id="name" type="text" {...registerIPFS("cidVersion")} />
                 {ipfsErrors.name && (
-                  <span>{ipfsErrors.name.message as string}</span>
+                  <span className="text-sm text-red-600 mt-2">
+                    {ipfsErrors.name.message as string}
+                  </span>
                 )}
               </div>
-              <button type="submit">アップロード</button>
+              <Button design="primary" buttonType="submit">
+                Upload to IPFS
+              </Button>
             </form>
           </div>
         </div>
       )}
+      {/* Loading indicator */}
+      {isWaiting && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white w-16 h-16 rounded-full border-t-4 border-blue-500 animate-spin ease-linear"></div>
+        </div>
+      )}
+      {/* Mint! */}
       {cids.length > 0 && (
         <div className="container w-full">
           <form onSubmit={handleSubmitMint(mint)}>
@@ -126,7 +183,9 @@ const IchimatsuMintOrganism: FC = () => {
                 {...registerMint("name", { required: "Name is required" })}
               />
               {mintErrors.name && (
-                <span>{mintErrors.name.message as string}</span>
+                <span className="text-sm text-red-600 mt-2">
+                  {mintErrors.name.message as string}
+                </span>
               )}
             </div>
             <div>
@@ -150,7 +209,9 @@ const IchimatsuMintOrganism: FC = () => {
                 })}
               />
               {mintErrors.royaltyRecipient && (
-                <span>{mintErrors.royaltyRecipient.message as string}</span>
+                <span className="text-sm text-red-600 mt-2">
+                  {mintErrors.royaltyRecipient.message as string}
+                </span>
               )}
             </div>
             <div>
@@ -163,10 +224,14 @@ const IchimatsuMintOrganism: FC = () => {
                 })}
               />
               {mintErrors.royaltyBps && (
-                <span>{mintErrors.royaltyBps.message as string}</span>
+                <span className="text-sm text-red-600 mt-2">
+                  {mintErrors.royaltyBps.message as string}
+                </span>
               )}
             </div>
-            <button type="submit">Mint NFT</button>
+            <Button design="primary" buttonType="submit">
+              Mint NFT
+            </Button>
           </form>
         </div>
       )}

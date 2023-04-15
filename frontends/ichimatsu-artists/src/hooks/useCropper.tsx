@@ -33,7 +33,13 @@ export const useCropper = (
     handleSubmit: handleSubmitCrop,
     formState: { errors: cropErrors },
     watch: watchCrop,
-  } = useForm<CropFormSchema>({ resolver: yupResolver(cropFormSchema) });
+  } = useForm<CropFormSchema>({
+    resolver: yupResolver(cropFormSchema),
+    defaultValues: {
+      cols: 3,
+      rows: 3,
+    },
+  });
 
   const imageRef = useRef<HTMLImageElement | null>(null);
   const cropperRef = useRef<Cropper | null>(null);

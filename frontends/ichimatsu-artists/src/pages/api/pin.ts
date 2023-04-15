@@ -24,7 +24,7 @@ const handler = async (
   }
   if (req.method === "POST") {
     try {
-      const form: IncomingForm = new IncomingForm();
+      const form = new IncomingForm();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data = await new Promise<Record<string, any>>((resolve, reject) => {
         console.log("Before form.parse");
@@ -40,12 +40,12 @@ const handler = async (
         });
       });
 
-      const file = data.files.file;
-      const fileStream = fs.createReadStream(file.filepath);
+      const file = data.files.file; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const fileStream = fs.createReadStream(file.filepath); // eslint-disable-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
       const formData = new FormData();
       formData.append("file", fileStream, {
-        filename: file.originalFilename,
-        contentType: file.mimetype,
+        filename: file.originalFilename, // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        contentType: file.mimetype, // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       });
 
       const headers = {
@@ -62,6 +62,7 @@ const handler = async (
       );
 
       console.log("/api/pin is finished!");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
       fs.unlink(file.filepath, (err) => {
         if (err) {
           console.error("Error deleting temporary file:", err);

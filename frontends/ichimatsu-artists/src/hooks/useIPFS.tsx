@@ -11,6 +11,7 @@ import {
 } from "react-hook-form";
 
 export const useIPFS = (): [
+  boolean,
   string[],
   UseFormRegister<IPFSFormSchema>,
   UseFormHandleSubmit<IPFSFormSchema>,
@@ -21,6 +22,7 @@ export const useIPFS = (): [
 ] => {
   const [slices, setSlices] = useState<string[]>([]);
   const [cids, setCids] = useState<string[]>([]);
+  const [isWaiting, setIsWaiting] = useState(false);
 
   const {
     register: registerIPFS,
@@ -32,6 +34,8 @@ export const useIPFS = (): [
   });
 
   const uploadSlicedImagesToIPFS = async () => {
+    setIsWaiting(true);
+
     const name = watchIPFS("name");
     const cidVersion = watchIPFS("cidVersion");
 
@@ -54,10 +58,13 @@ export const useIPFS = (): [
       console.log("アップロード成功:", cids);
     } catch (error) {
       console.error("アップロードエラー:", error);
+    } finally {
+      setIsWaiting(false);
     }
   };
 
   return [
+    isWaiting,
     cids,
     registerIPFS,
     handleSubmitIPFS,

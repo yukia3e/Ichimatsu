@@ -21,6 +21,9 @@ module.exports = {
         warn: colors.yellow,
         success: colors.green,
       },
+      fontFamily: {
+        logo: ["grenadine-mvb", "sans-serif"],
+      },
     },
   },
   plugins: [],

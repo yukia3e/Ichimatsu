@@ -1,40 +1,19 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import type { MintFormSchema } from "@/schemas/mintForm";
+import { mintFormSchema } from "@/schemas/mintForm";
 import {
   FieldErrors,
   UseFormHandleSubmit,
   UseFormRegister,
   useForm,
 } from "react-hook-form";
-import * as yup from "yup";
-
-interface mintFormValues {
-  name: string;
-  symbol: string;
-  royaltyRecipient: string;
-  royaltyBps: number;
-}
-
-const mintSchema = yup.object().shape({
-  image: yup.mixed().required("Image is required"),
-  name: yup.string().required("Name is required"),
-  symbol: yup.string().required("Symbol is required"),
-  royaltyRecipient: yup
-    .string()
-    .required("Royalty Recipient is required")
-    .matches(/^0x[a-fA-F0-9]{40}$/, "Invalid wallet address"),
-  royaltyBps: yup
-    .number()
-    .typeError("Royalty Bps must be a number")
-    .required("Royalty Bps is required")
-    .positive("Royalty Bps must be a positive number"),
-});
 
 export const useIchimatsuMint = (
   cids: string[]
 ): [
-  UseFormRegister<mintFormValues>,
-  UseFormHandleSubmit<mintFormValues>,
-  FieldErrors<mintFormValues>,
+  UseFormRegister<MintFormSchema>,
+  UseFormHandleSubmit<MintFormSchema>,
+  FieldErrors<MintFormSchema>,
   () => void
 ] => {
   const {
@@ -42,7 +21,7 @@ export const useIchimatsuMint = (
     handleSubmit: handleSubmitMint,
     formState: { errors: mintErrors },
     watch: watchMint,
-  } = useForm<mintFormValues>({ resolver: yupResolver(mintSchema) });
+  } = useForm<MintFormSchema>({ resolver: yupResolver(mintFormSchema) });
 
   const mint = () => {
     const name = watchMint("name");
