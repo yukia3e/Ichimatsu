@@ -18,7 +18,9 @@ We named the service to be such a service that "a little Step for artists can bo
 
 ## Features
 
-(WIP)
+- Whether you already have a wallet or not, you can start your Web3 experience with Web2-like ease!
+- This is recommended for artists who have not started with NFTs because they are confused about how to prepare NFTs from a single photo.
+  - You can easily make your LIVE memories into digital collectibles by dividing and presenting photos from your events.
 
 ## Libraries and technologies used
 
