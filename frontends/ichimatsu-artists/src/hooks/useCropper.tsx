@@ -2,92 +2,43 @@ import {
   Dispatch,
   MutableRefObject,
   SetStateAction,
-  useEffect,
   useRef,
   useState,
 } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import type { CropFormSchema } from "@/schemas/cropperForm";
+import { cropFormSchema } from "@/schemas/cropperForm";
 import Cropper from "cropperjs";
 import {
   FieldErrors,
-  FieldValues,
-  SubmitHandler,
   UseFormHandleSubmit,
   UseFormRegister,
   useForm,
 } from "react-hook-form";
-import * as yup from "yup";
-
-interface cropFormValues {
-  cols: number;
-  rows: number;
-}
-
-const imageSchema = yup.object().shape({
-  image: yup.mixed().required("Image is required"),
-});
-
-const cropSchema = yup.object().shape({
-  cols: yup
-    .number()
-    .typeError("Col must be a number")
-    .required("Col is required")
-    .positive("Col must be a positive number")
-    .integer("Col must be a integer number"),
-  rows: yup
-    .number()
-    .typeError("Row must be a number")
-    .required("Row is required")
-    .positive("Row must be a positive number")
-    .integer("Row must be a integer number"),
-});
 
 export const useCropper = (
   setSlices: Dispatch<SetStateAction<string[]>>
 ): [
-  SubmitHandler<FieldValues>,
-  UseFormRegister<FieldValues>,
-  UseFormHandleSubmit<FieldValues>,
-  FieldErrors<FieldValues>,
-  UseFormRegister<cropFormValues>,
-  UseFormHandleSubmit<cropFormValues>,
-  FieldErrors<cropFormValues>,
   MutableRefObject<HTMLImageElement | null>,
   number,
-  string | ArrayBuffer | null,
+  FieldErrors<CropFormSchema>,
+  () => void,
+  () => void,
+  UseFormRegister<CropFormSchema>,
+  UseFormHandleSubmit<CropFormSchema>,
   () => void
 ] => {
-  const {
-    register: registerImage,
-    handleSubmit: handleSubmitImage,
-    formState: { errors: imageErrors },
-  } = useForm({ resolver: yupResolver(imageSchema) });
-
   const {
     register: registerCrop,
     handleSubmit: handleSubmitCrop,
     formState: { errors: cropErrors },
     watch: watchCrop,
-  } = useForm<cropFormValues>({ resolver: yupResolver(cropSchema) });
+  } = useForm<CropFormSchema>({ resolver: yupResolver(cropFormSchema) });
 
   const imageRef = useRef<HTMLImageElement | null>(null);
   const cropperRef = useRef<Cropper | null>(null);
 
-  const [imageHoverWidth, setImageHoverWidth] = useState(0.0);
-  const [imageSource, setImageSource] = useState<string | ArrayBuffer | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (imageSource) {
-      destroyCropper();
-      initCropper();
-    }
-
-    return () => {
-      destroyCropper();
-    };
-  }, [imageSource]);
+  const [croppedImageHoverWidth, setCroppedImageHoverWidth] = useState(0.0);
 
   const initCropper = () => {
     if (imageRef.current && !cropperRef.current) {
@@ -95,29 +46,6 @@ export const useCropper = (
         viewMode: 1,
         background: false,
       });
-    }
-  };
-
-  const readImageFile: SubmitHandler<FieldValues> = (data, event) => {
-    if (event) {
-      event.preventDefault();
-      const target = event.target as HTMLInputElement;
-      const file = target.files && target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-
-      const onLoadHandler = () => {
-        setImageSource(reader.result);
-      };
-
-      reader.addEventListener("load", onLoadHandler);
-
-      reader.onloadend = () => {
-        reader.removeEventListener("load", onLoadHandler);
-      };
-
-      reader.readAsDataURL(file);
     }
   };
 
@@ -129,13 +57,12 @@ export const useCropper = (
   };
 
   const sliceAndPreview = () => {
-    console.log("sliceAndPreview is called");
     const cols = watchCrop("cols");
     const rows = watchCrop("rows");
 
     if (cropperRef.current) {
       const tmpNum = 100 / cols - 0.5;
-      setImageHoverWidth(Math.floor(tmpNum * 10) / 10);
+      setCroppedImageHoverWidth(Math.floor(tmpNum * 10) / 10);
       const cropper = cropperRef.current;
       const canvas = cropper.getCroppedCanvas();
       const { width, height } = canvas;
@@ -176,16 +103,13 @@ export const useCropper = (
   };
 
   return [
-    readImageFile,
-    registerImage,
-    handleSubmitImage,
-    imageErrors,
+    imageRef,
+    croppedImageHoverWidth,
+    cropErrors,
+    initCropper,
+    destroyCropper,
     registerCrop,
     handleSubmitCrop,
-    cropErrors,
-    imageRef,
-    imageHoverWidth,
-    imageSource,
     sliceAndPreview,
   ];
 };

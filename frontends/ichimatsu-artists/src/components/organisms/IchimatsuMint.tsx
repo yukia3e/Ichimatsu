@@ -3,6 +3,7 @@ import { useCropper } from "@/hooks/useCropper";
 import { useIPFS } from "@/hooks/useIPFS";
 import { useIchimatsuMint } from "@/hooks/useIchimatsuMint";
 import "cropperjs/dist/cropper.min.css";
+import { useImageSelector } from "@/hooks/userImageSelector";
 
 const IchimatsuMintOrganism: FC = () => {
   const [
@@ -16,18 +17,23 @@ const IchimatsuMintOrganism: FC = () => {
   ] = useIPFS();
 
   const [
+    imageRef,
+    croppedImageHoverWidth,
+    cropErrors,
+    initCropper,
+    destroyCropper,
+    registerCrop,
+    handleSubmitCrop,
+    sliceAndPreview,
+  ] = useCropper(setSlices);
+
+  const [
+    imageSource,
+    imageErrors,
     readImageFile,
     registerImage,
     handleSubmitImage,
-    imageErrors,
-    registerCrop,
-    handleSubmitCrop,
-    cropErrors,
-    imageRef,
-    imageHoverWidth,
-    imageSource,
-    sliceAndPreview,
-  ] = useCropper(setSlices);
+  ] = useImageSelector(imageRef, initCropper, destroyCropper);
 
   const [registerMint, handleSubmitMint, mintErrors, mint] =
     useIchimatsuMint(cids);
@@ -80,7 +86,7 @@ const IchimatsuMintOrganism: FC = () => {
           <div className="flex flex-wrap gap-0.5">
             {slices.map((slice, index) => (
               <img
-                className={`w-[${imageHoverWidth}%]`}
+                className={`w-[${croppedImageHoverWidth}%]`}
                 key={index}
                 src={slice}
                 alt={`slice-${index}`}
