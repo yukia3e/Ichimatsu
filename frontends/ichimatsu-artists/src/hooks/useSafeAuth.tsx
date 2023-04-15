@@ -45,7 +45,7 @@ export const useSafeAuth = (): [
         clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "",
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: process.env.NEXT_PUBLIC_CHAIN_ID || "",
+          chainId: process.env.NEXT_PUBLIC_CHAIN_ID_HEX || "",
           // rpcTarget: `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
         },
         uiConfig: {
