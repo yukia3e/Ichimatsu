@@ -1,6 +1,5 @@
 import IchimatsuNFTABIJson from "@/contracts/IchimatsuNFT.sol/IchimatsuNFT.json";
 import { ConstructorRequestBody } from "@/domains/types/deploy";
-import { Network } from "alchemy-sdk";
 import { ethers } from "ethers";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -15,8 +14,6 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  console.log("Check - Before - ");
-
   if (process.env.NEXT_PUBLIC_CHAIN_ID === undefined) {
     throw new Error("NEXT_PUBLIC_CHAIN_ID is undefined");
   }
@@ -28,45 +25,34 @@ export default async function handler(
   }
 
   try {
-    console.log("Get req - Before - ");
     const { name, symbol, royaltyRecipient, royaltyBps } =
       req.body as ConstructorRequestBody;
 
-    console.log("Create Providers - Before - ");
     const provider = new ethers.providers.AlchemyProvider(
-      Network.MATIC_MUMBAI,
+      "maticmum",
       process.env.ALCHEMY_API_KEY
     );
 
-    console.log("Create Wallet - Before - ");
     const signer = new ethers.Wallet(
       process.env.ICHIMATSU_PRIVATE_KEY,
       provider
     );
 
-    console.log("Create ContractFactory - Before - ");
     const contractFactory = new ethers.ContractFactory(
       IchimatsuNFTABIJson.abi,
       CONTRACT_BYTECODE,
       signer
     );
 
-    console.log("Deploy - Before - ");
-    const contract = await contractFactory.deploy([
-      name,
-      symbol,
-      royaltyRecipient || "",
-      royaltyBps || 0.0,
-    ]);
+    const deployArgs = [name, symbol, royaltyRecipient, royaltyBps];
+    const contract = await contractFactory.deploy(...deployArgs);
 
-    console.log("Deploy Waiting - Before - ");
     await contract.deployed();
-
-    console.log(`NFT deployed to ${contract.address}`);
 
     // コントラクトアドレスをレスポンスとして返す
     res.status(200).json({ contractAddress: contract.address });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ message: "Contract deployment failed", error: error });

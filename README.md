@@ -37,8 +37,8 @@ We named the service to be such a service that "a little Step for artists can bo
 
 ### Link to deployed smart contracts
 
-(WIP)
+https://mumbai.polygonscan.com/address/0x0dA1D5cDc5f3ea2D4688ee74f684Efe0282CD558
 
 ### Link to tweet
 
-(WIP)
+https://twitter.com/yukia3e/status/1647377359937605632

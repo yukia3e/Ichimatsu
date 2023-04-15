@@ -915,36 +915,40 @@ export default async function handler(
   }
 
   try {
+    console.log(1);
     const { contractAddress, to, quantity, baseURI, data } =
       req.body as MintRequestBody; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 
+    console.log(1.5, contractAddress, to, quantity, baseURI, data);
+    console.log(2);
     const provider = new ethers.providers.AlchemyProvider(
-      Network.MATIC_MUMBAI,
+      "maticmum",
       process.env.ALCHEMY_API_KEY
     );
 
+    console.log(3);
     const signer = new ethers.Wallet(
       process.env.ICHIMATSU_PRIVATE_KEY,
       provider
     );
 
+    console.log(4);
     const contractInstance = new ethers.Contract(
       contractAddress,
       contractABI,
       signer
     );
 
-    const batchMintTx = await contractInstance.batchMintTo(
-      to,
-      quantity,
-      baseURI,
-      data
-    );
+    console.log(5);
+    const mintArgs = [to, quantity, baseURI, data];
+    console.log(mintArgs);
+    const batchMintTx = await contractInstance.batchMintTo(...mintArgs);
     await batchMintTx.wait();
 
     // トランザクションハッシュをレスポンスとして返す
     res.status(200).json({ txHash: batchMintTx.hash });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Minting failed", error: error });
   }
 }
