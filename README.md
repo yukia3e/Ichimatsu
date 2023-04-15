@@ -22,11 +22,16 @@ We named the service to be such a service that "a little Step for artists can bo
 
 ## Libraries and technologies used
 
-(WIP)
-
-## ## How to use
-
-(WIP)
+- React
+  - Next.js
+  - Zustand
+- Polygon
+- Safe{Core} Account Abstraction SDK
+  - Auth Kit
+    - web3auth
+  - Relay Kit (WIP)
+    - Gelato
+- Pinata
 
 ## for Build #onPolygon in Public Pool Prize 🏊‍♂️
 
