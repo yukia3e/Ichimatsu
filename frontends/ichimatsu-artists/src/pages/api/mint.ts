@@ -940,10 +940,14 @@ export default async function handler(
     );
 
     console.log(5);
-    const mintArgs = [to, quantity, baseURI, data];
+    const mintArgs = [to, quantity, baseURI, "0x"];
+
+    console.log(6);
     console.log(mintArgs);
     const batchMintTx = await contractInstance.batchMintTo(...mintArgs);
     await batchMintTx.wait();
+
+    console.log(batchMintTx);
 
     // トランザクションハッシュをレスポンスとして返す
     res.status(200).json({ txHash: batchMintTx.hash });

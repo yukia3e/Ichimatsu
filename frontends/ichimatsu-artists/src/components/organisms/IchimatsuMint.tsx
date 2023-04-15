@@ -261,52 +261,82 @@ const IchimatsuMintOrganism: FC = () => {
       {ipfsHash && (
         <div className="container w-full">
           <form onSubmit={handleSubmitDeploy(deploy)}>
-            <div>
-              <label htmlFor="name">Name</label>
-              <input
-                id="name"
-                type="text"
-                {...registerDeploy("name", { required: "Name is required" })}
-              />
+            <div className="mb-4 px-4">
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerDeploy("name", { required: "Name is required" })}
+                />
+              </div>
               {deployErrors.name && (
                 <span className="text-sm text-red-600 mt-2">
                   {deployErrors.name.message as string}
                 </span>
               )}
             </div>
-            <div>
-              <label htmlFor="symbol">Symbol</label>
-              <input
-                id="symbol"
-                type="text"
-                {...registerDeploy("symbol", {
-                  required: "Symbol is required",
-                })}
-              />
+            <div className="mb-4 px-4">
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="symbol"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Symbol
+                </label>
+                <input
+                  id="symbol"
+                  type="text"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerDeploy("symbol", {
+                    required: "Symbol is required",
+                  })}
+                />
+              </div>
               {deployErrors.symbol && (
                 <span>{deployErrors.symbol.message as string}</span>
               )}
             </div>
-            <div>
-              <label htmlFor="royaltyRecipient">Royalty Recipient</label>
-              <input
-                id="royaltyRecipient"
-                type="text"
-                {...registerDeploy("royaltyRecipient", {
-                  required: "Royalty Recipient is required",
-                })}
-              />
+            <div className="mb-4 px-4">
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="royaltyRecipient"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Royalty Recipient
+                </label>
+                <input
+                  id="royaltyRecipient"
+                  type="text"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerDeploy("royaltyRecipient", {
+                    required: "Royalty Recipient is required",
+                  })}
+                />
+              </div>
               {deployErrors.royaltyRecipient && (
                 <span className="text-sm text-red-600 mt-2">
                   {deployErrors.royaltyRecipient.message as string}
                 </span>
               )}
             </div>
-            <div>
-              <label htmlFor="royaltyBps">Royalty Bps</label>
+            <div className="flex flex-row justify-around my-4">
+              <label
+                htmlFor="royaltyBps"
+                className="block text-sm font-medium mx-4 my-auto w-1/3"
+              >
+                Royalty Bps
+              </label>
               <input
                 id="royaltyBps"
                 type="number"
+                className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
                 {...registerDeploy("royaltyBps", {
                   required: "Royalty Bps is required",
                 })}
