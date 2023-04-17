@@ -63,7 +63,7 @@ export const useJSONToIPFS = (
           description: `${eventName || ""}  ${eventDate || ""} by ${
             artistName || ""
           }`,
-          external_link: `ipfs://${cid}`,
+          image: `ipfs://${cid}`,
         };
         if (attributes.length > 0) metadata.attributes = attributes;
 

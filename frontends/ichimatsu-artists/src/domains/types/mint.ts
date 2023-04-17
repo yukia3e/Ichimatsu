@@ -9,7 +9,7 @@ export type MintRequestBody = {
 export type Metadata = {
   name: string;
   description: string;
-  external_link: string;
+  image: string;
   attributes?: Attribute[];
 };
 

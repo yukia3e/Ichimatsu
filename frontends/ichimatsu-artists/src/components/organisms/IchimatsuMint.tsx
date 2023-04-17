@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import Button from "@/components/atoms/Button";
 import { useCropper } from "@/hooks/useCropper";
 import { useIchimatsuDeploy } from "@/hooks/useIchimatsuDeploy";
@@ -377,12 +378,25 @@ const IchimatsuMintOrganism: FC = () => {
       )}
       {/* trxAddress */}
       {txAddress && (
-        <div className="container w-full">
-          <span className="font-logo">Minted!!</span>
+        <div className="flex flex-col">
+          <div className="w-full">
+            <span className="font-logo">Minted!!</span>
+          </div>
           <br />
-          <span className="font-logo text-sm flex flex-wrap">
-            trxAddress: {`${txAddress}`}
-          </span>
+          <div className="w-full">
+            <span className="font-logo text-sm">
+              trxAddress:
+              <br />
+              <a
+                href={`https://mumbai.polygonscan.com/tx/${txAddress}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {`${txAddress.slice(0, 5)}...${txAddress.slice(-5)}`}{" "}
+                <FaExternalLinkAlt />
+              </a>
+            </span>
+          </div>
         </div>
       )}
     </div>
