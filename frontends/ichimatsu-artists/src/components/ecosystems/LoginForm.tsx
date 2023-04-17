@@ -1,9 +1,9 @@
 import { FC } from "react";
 import LoginFormOrganism from "@/components/organisms/LoginForm";
-import { useSafeAuth } from "@/hooks/useSafeAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 const LoginFormEcosystem: FC = () => {
-  const [login, _] = useSafeAuth();
+  const [login, _] = useAuth();
 
   return <LoginFormOrganism login={login} />;
 };
