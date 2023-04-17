@@ -24,6 +24,7 @@
     "@web3auth/base": "^5.1.0",
     "@web3auth/modal": "^5.1.1",
     "@web3auth/openlogin-adapter": "^5.1.1",
+    "@web3auth/torus-wallet-connector-plugin": "^5.1.0",
     "alchemy-sdk": "^2.8.0",
     "async-file": "^2.0.2",
     "autoprefixer": "10.4.14",

@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import type { AppProps } from "next/app";
 import router from "next/router";
-import useSafeAuthStore from "@/stores/useSafeAuthStore";
+import useAuthStore from "@/stores/useAuthStore";
 import "@/styles/globals.css";
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
-  const provider = useSafeAuthStore((state) => state.provider);
+  const provider = useAuthStore((state) => state.provider);
   const isLoggedIn = provider !== null;
 
   useEffect(() => {
@@ -20,6 +20,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
     if (isLoggedIn) {
       return;
     } else {
+      if (router.pathname === "/icon.png") return;
       router.push("/"); // eslint-disable-line @typescript-eslint/no-floating-promises
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

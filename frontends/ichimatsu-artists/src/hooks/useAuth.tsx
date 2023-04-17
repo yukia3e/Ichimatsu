@@ -1,10 +1,5 @@
 import { SyntheticEvent, useEffect } from "react";
 import {
-  SafeAuthKit,
-  Web3AuthAdapter,
-  Web3AuthEventListener,
-} from "@safe-global/auth-kit";
-import {
   CHAIN_NAMESPACES,
   WALLET_ADAPTERS,
   ADAPTER_EVENTS,
@@ -12,8 +7,15 @@ import {
 } from "@web3auth/base";
 import { Web3AuthOptions } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import router, { useRouter } from "next/router";
-import useSafeAuthStore from "@/stores/useSafeAuthStore";
+import * as colors from "tailwindcss/colors";
+import {
+  AuthKit,
+  Web3AuthAdapter,
+  Web3AuthEventListener,
+} from "@/features/auth";
+import useAuthStore from "@/stores/useAuthStore";
 
 const connectedHandler: Web3AuthEventListener = (data) => {
   console.log("CONNECTED", data);
@@ -26,17 +28,17 @@ const disconnectedHandler: Web3AuthEventListener = (data) => {
   return router.push("/");
 };
 
-export const useSafeAuth = (): [
+export const useAuth = (): [
   (event: SyntheticEvent) => Promise<void>,
   (event: SyntheticEvent) => Promise<void>
 ] => {
   const router = useRouter();
-  const safeAuthKit = useSafeAuthStore((state) => state.safeAuthKit);
-  const setSafeAuthKit = useSafeAuthStore((state) => state.setSafeAuthKit);
-  const setProvider = useSafeAuthStore((state) => state.setProvider);
-  const setSafeAuthSignInData = useSafeAuthStore(
-    (state) => state.setSafeAuthSignInData
-  );
+  const authKit = useAuthStore((state) => state.authKit);
+  const torusPlugin = useAuthStore((state) => state.torusPlugin);
+  const setAuthKit = useAuthStore((state) => state.setAuthKit);
+  const setProvider = useAuthStore((state) => state.setProvider);
+  const setAuthSignInData = useAuthStore((state) => state.setAuthSignInData);
+  const setTorusPlugin = useAuthStore((state) => state.setTorusPlugin);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -46,7 +48,6 @@ export const useSafeAuth = (): [
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
           chainId: process.env.NEXT_PUBLIC_CHAIN_ID || "",
-          // rpcTarget: `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
         },
         uiConfig: {
           theme: "light",
@@ -119,24 +120,42 @@ export const useSafeAuth = (): [
         },
       });
 
+      const torusPlugin = new TorusWalletConnectorPlugin({
+        torusWalletOpts: {},
+        walletInitOptions: {
+          whiteLabel: {
+            theme: {
+              isDark: true,
+              colors: {
+                torusBrand1: colors.gray[500],
+                torusGray2: colors.white[500],
+              },
+            },
+            logoLight: `https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png`,
+            logoDark:
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
+          },
+          useWalletConnect: true, // make sure this is enabled before using the showWalletConnectScanner function
+        },
+      });
+
       const adapter = new Web3AuthAdapter(
         options,
         [openloginAdapter],
-        modalConfig
+        modalConfig,
+        [torusPlugin]
       );
 
-      const safeAuthKit = await SafeAuthKit.init(adapter);
+      const authKit = await AuthKit.init(adapter);
 
-      safeAuthKit.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
-      safeAuthKit.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
-      setSafeAuthKit(safeAuthKit);
+      authKit.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
+      authKit.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
+      setAuthKit(authKit);
+      setTorusPlugin(torusPlugin);
 
       return () => {
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
-        safeAuthKit.unsubscribe(
-          ADAPTER_EVENTS.DISCONNECTED,
-          disconnectedHandler
-        );
+        authKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
+        authKit.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
       };
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,13 +163,13 @@ export const useSafeAuth = (): [
 
   const login = async (event: SyntheticEvent) => {
     event.preventDefault();
-    if (!safeAuthKit) return;
+    if (!authKit) return;
 
-    const response = await safeAuthKit.signIn();
+    const response = await authKit.signIn();
     console.log("SIGN IN RESPONSE: ", response);
 
-    setSafeAuthSignInData(response);
-    setProvider(safeAuthKit.getProvider() as SafeEventEmitterProvider);
+    setAuthSignInData(response);
+    setProvider(authKit.getProvider() as SafeEventEmitterProvider);
     // for test only
     // console.log(await authKit.authenticateUser())
     // for test only
@@ -159,14 +178,18 @@ export const useSafeAuth = (): [
 
   const logout = async (event: SyntheticEvent) => {
     event.preventDefault();
-    if (!safeAuthKit) {
+    if (!authKit) {
       console.error("authKit init error");
 
       return;
     }
-    await safeAuthKit.signOut();
+
+    // TODO: torus-embed を消す
+    torusPlugin?.torusWalletInstance.hideTorusButton();
+
+    await authKit.signOut();
     setProvider(null);
-    setSafeAuthSignInData(null);
+    setAuthSignInData(null);
   };
 
   return [login, logout];

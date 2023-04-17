@@ -4,7 +4,7 @@ import router from "next/router";
 import mintNFTs from "@/domains/api/mint";
 import { mintFormSchema } from "@/schemas/mintForm";
 import type { MintFormSchema } from "@/schemas/mintForm";
-import useSafeAuthStore from "@/stores/useSafeAuthStore";
+import useAuthStore from "@/stores/useAuthStore";
 import { UseFormHandleSubmit, useForm } from "react-hook-form";
 
 export const useIchimatsuMint = (
@@ -18,9 +18,7 @@ export const useIchimatsuMint = (
   boolean,
   string
 ] => {
-  const safeAuthSignInData = useSafeAuthStore(
-    (state) => state.safeAuthSignInData
-  );
+  const authSignInData = useAuthStore((state) => state.authSignInData);
   const [isWaitingMint, setIsWaitingMint] = useState(false);
   const [txAddress, setTxAddress] = useState("");
   const { handleSubmit: handleSubmitMint } = useForm<MintFormSchema>({
@@ -29,7 +27,7 @@ export const useIchimatsuMint = (
 
   const mint = async () => {
     try {
-      if (!safeAuthSignInData) {
+      if (!authSignInData) {
         router.push("/"); // eslint-disable-line @typescript-eslint/no-floating-promises
 
         return;
@@ -41,7 +39,7 @@ export const useIchimatsuMint = (
         throw new Error("nftContractAddress is empty");
       }
       setIsWaitingMint(true);
-      const artistAddress = safeAuthSignInData.eoa;
+      const artistAddress = authSignInData.eoa;
       const quantity = cols * rows;
       const txAddress = await mintNFTs(
         artistAddress,

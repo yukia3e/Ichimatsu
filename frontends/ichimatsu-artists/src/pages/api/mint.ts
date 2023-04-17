@@ -1,5 +1,4 @@
 import { MintRequestBody } from "@/domains/types/mint";
-import { Network } from "alchemy-sdk";
 import { ethers } from "ethers";
 import { NextApiRequest, NextApiResponse } from "next";
 

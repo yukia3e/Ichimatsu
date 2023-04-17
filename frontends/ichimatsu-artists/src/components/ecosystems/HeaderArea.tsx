@@ -1,15 +1,15 @@
 import type { FC } from "react";
 import HeaderAreaOrganism from "@/components/organisms/HeaderArea";
-import { useSafeAuth } from "@/hooks/useSafeAuth";
-import useSafeAuthStore from "@/stores/useSafeAuthStore";
+import { useAuth } from "@/hooks/useAuth";
+import useAuthStore from "@/stores/useAuthStore";
 
 type Props = {
   isForTop?: boolean;
 };
 
 const HeaderEcosystem: FC<Props> = ({ isForTop }) => {
-  const [_, logout] = useSafeAuth();
-  const provider = useSafeAuthStore((state) => state.provider);
+  const [_, logout] = useAuth();
+  const provider = useAuthStore((state) => state.provider);
   const isLoggedIn = provider !== null;
 
   return (

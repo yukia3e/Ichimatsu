@@ -2,7 +2,7 @@ import { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import deployContract from "@/domains/api/deploy";
 import { DeployFormSchema, deployFormSchema } from "@/schemas/deloyForm";
-import useSafeAuthStore from "@/stores/useSafeAuthStore";
+import useAuthStore from "@/stores/useAuthStore";
 import {
   FieldErrors,
   UseFormHandleSubmit,
@@ -18,9 +18,7 @@ export const useIchimatsuDeploy = (): [
   boolean,
   string
 ] => {
-  const safeAuthSignInData = useSafeAuthStore(
-    (state) => state.safeAuthSignInData
-  );
+  const authSignInData = useAuthStore((state) => state.authSignInData);
   const [nftContractAddress, setNftContractAddress] = useState<string>("");
   const [isWaitingDeploy, setIsWaitingDeploy] = useState(false);
 
@@ -34,7 +32,7 @@ export const useIchimatsuDeploy = (): [
     defaultValues: {
       name: "Ichimatsu NFT",
       symbol: "INF",
-      royaltyRecipient: safeAuthSignInData ? safeAuthSignInData.eoa : "",
+      royaltyRecipient: authSignInData ? authSignInData.eoa : "",
       royaltyBps: 10,
     },
   });
