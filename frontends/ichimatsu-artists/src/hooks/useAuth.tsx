@@ -110,8 +110,10 @@ export const useAuth = (): [
         adapterSettings: {
           whiteLabel: {
             name: "Ichimatsu",
-            logoLight: "/logo.png",
-            logoDark: "/logo.png",
+            logoLight:
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png",
+            logoDark:
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },
         },
       });
@@ -121,9 +123,9 @@ export const useAuth = (): [
         walletInitOptions: {
           whiteLabel: {
             theme: { isDark: true, colors: { primary: "#9ca3af" } },
-            logoLight: `https://lh3.googleusercontent.com/u/0/drive-viewer/AAOQEOQnb3QW2v_BFGnS1w3jYqgR9vwirM6np5VjGrKf20sV6PkY9AdcCy5ctqypODq1lGwSv3NHdKL4bGyOI6mgmyawU4bJ9A=w2498-h1666`,
+            logoLight: `https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png`,
             logoDark:
-              "https://lh3.googleusercontent.com/u/0/drive-viewer/AAOQEOQnb3QW2v_BFGnS1w3jYqgR9vwirM6np5VjGrKf20sV6PkY9AdcCy5ctqypODq1lGwSv3NHdKL4bGyOI6mgmyawU4bJ9A=w2498-h1666",
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },
           useWalletConnect: true, // make sure this is enabled before using the showWalletConnectScanner function
           enableLogging: true,

@@ -111,8 +111,10 @@ export const useSafeAuth = (): [
         adapterSettings: {
           whiteLabel: {
             name: "Ichimatsu",
-            logoLight: "",
-            logoDark: "",
+            logoLight:
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png",
+            logoDark:
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },
         },
       });
