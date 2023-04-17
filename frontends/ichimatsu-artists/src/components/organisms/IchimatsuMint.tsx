@@ -380,7 +380,7 @@ const IchimatsuMintOrganism: FC = () => {
         <div className="container w-full">
           <span className="font-logo">Minted!!</span>
           <br />
-          <span className="font-logo text-sm">
+          <span className="font-logo text-sm flex flex-wrap">
             trxAddress: {`${txAddress}`}
           </span>
         </div>

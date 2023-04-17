@@ -3,6 +3,7 @@ import DashboardLinksAreaEcosystem from "@/components/ecosystems/DashboardLinksA
 import FooterAreaEcosystem from "@/components/ecosystems/FooterArea";
 import HeaderAreaEcosystem from "@/components/ecosystems/HeaderArea";
 import Title from "../atoms/Title";
+import AccountsAreaEcosystem from "../ecosystems/AccountsArea";
 
 const DashboardTemplate: FC = () => {
   return (
@@ -11,6 +12,7 @@ const DashboardTemplate: FC = () => {
       <main className="container p-4 mx-auto">
         <Title>Dashboard</Title>
         <DashboardLinksAreaEcosystem />
+        <AccountsAreaEcosystem />
       </main>
       <FooterAreaEcosystem />
     </>
