@@ -9,6 +9,7 @@ import { Web3AuthOptions } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import router, { useRouter } from "next/router";
+import * as colors from "tailwindcss/colors";
 import {
   AuthKit,
   Web3AuthAdapter,
@@ -33,6 +34,7 @@ export const useAuth = (): [
 ] => {
   const router = useRouter();
   const authKit = useAuthStore((state) => state.authKit);
+  const torusPlugin = useAuthStore((state) => state.torusPlugin);
   const setAuthKit = useAuthStore((state) => state.setAuthKit);
   const setProvider = useAuthStore((state) => state.setProvider);
   const setAuthSignInData = useAuthStore((state) => state.setAuthSignInData);
@@ -122,13 +124,18 @@ export const useAuth = (): [
         torusWalletOpts: {},
         walletInitOptions: {
           whiteLabel: {
-            theme: { isDark: true, colors: { primary: "#9ca3af" } },
+            theme: {
+              isDark: true,
+              colors: {
+                torusBrand1: colors.gray[500],
+                torusGray2: colors.white[500],
+              },
+            },
             logoLight: `https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png`,
             logoDark:
               "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },
           useWalletConnect: true, // make sure this is enabled before using the showWalletConnectScanner function
-          enableLogging: true,
         },
       });
 
@@ -179,6 +186,9 @@ export const useAuth = (): [
     await authKit.signOut();
     setProvider(null);
     setAuthSignInData(null);
+
+    // TODO: torus-embed を消す
+    await torusPlugin?.torusWalletInstance.logout();
   };
 
   return [login, logout];
