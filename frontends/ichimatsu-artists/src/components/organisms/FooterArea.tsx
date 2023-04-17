@@ -1,15 +1,18 @@
 import type { FC } from "react";
-import Link from "next/link";
-import Logo from "@/components/atoms/Logo";
+import LogoMolecule from "../molecules/Logo";
 
-const FooterOrganism: FC = () => {
+type Props = {
+  isLoggedIn: boolean;
+};
+
+const FooterOrganism: FC<Props> = ({ isLoggedIn }) => {
   return (
     <footer className="bg-white">
       <div className="w-full p-2 mx-auto max-w-screen-xl md:py-8">
         <nav className="sm:flex sm:items-center sm:justify-between">
-          <Link href="/" className="flex items-center mb-4 sm:mb-0">
-            <Logo />
-          </Link>
+          <div className="flex items-center mb-4 sm:mb-0">
+            <LogoMolecule isLoggedIn={isLoggedIn} />
+          </div>
           <ul className="flex flex-wrap items-center mb-6 text-sm font-medium text-primary-500 sm:mb-0">
             <li>
               <a

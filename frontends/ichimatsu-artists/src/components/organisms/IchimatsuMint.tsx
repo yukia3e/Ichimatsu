@@ -84,12 +84,14 @@ const IchimatsuMintOrganism: FC = () => {
       {/* Crop and Preview */}
       {imageSource && (
         <div className="container w-full">
-          <img
-            ref={imageRef}
-            src={imageSource as string}
-            alt="selected"
-            style={{ maxWidth: "100%" }}
-          />
+          <div className="m-4">
+            <img
+              ref={imageRef}
+              src={imageSource as string}
+              alt="selected"
+              style={{ maxWidth: "100%" }}
+            />
+          </div>
           <div>
             <form onSubmit={handleSubmitCrop(sliceAndPreview)}>
               <div className="mb-4 px-4">

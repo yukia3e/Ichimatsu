@@ -54,6 +54,8 @@ export const useCropper = (
       cropperRef.current = new Cropper(imageRef.current, {
         viewMode: 1,
         background: false,
+        dragMode: "none",
+        initialAspectRatio: 1,
       });
     }
   };

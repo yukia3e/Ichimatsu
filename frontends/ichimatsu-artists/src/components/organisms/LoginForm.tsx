@@ -3,14 +3,19 @@ import Button from "@/components/atoms/Button";
 
 type Props = {
   login: (event: SyntheticEvent<Element, Event>) => Promise<void>;
+  isWaitingLoadAuth: boolean;
 };
 
-const LoginFormOrganism: FC<Props> = ({ login }) => {
+const LoginFormOrganism: FC<Props> = ({ login, isWaitingLoadAuth }) => {
   return (
     <section className="p-2 text-center">
-      <Button onClick={login} design="primary">
-        Sign In
-      </Button>
+      {!isWaitingLoadAuth ? (
+        <Button onClick={login} design="primary">
+          Sign In
+        </Button>
+      ) : (
+        <>Loading...</>
+      )}
     </section>
   );
 };

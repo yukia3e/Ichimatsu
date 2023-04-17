@@ -112,7 +112,7 @@ export const useSafeAuth = (): [
           whiteLabel: {
             name: "Ichimatsu",
             logoLight:
-              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png",
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
             logoDark:
               "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },

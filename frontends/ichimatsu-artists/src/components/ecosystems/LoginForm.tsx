@@ -3,9 +3,11 @@ import LoginFormOrganism from "@/components/organisms/LoginForm";
 import { useAuth } from "@/hooks/useAuth";
 
 const LoginFormEcosystem: FC = () => {
-  const [login, _] = useAuth();
+  const [isWaitingLoadAuth, login, _logout] = useAuth();
 
-  return <LoginFormOrganism login={login} />;
+  return (
+    <LoginFormOrganism login={login} isWaitingLoadAuth={isWaitingLoadAuth} />
+  );
 };
 
 export default LoginFormEcosystem;

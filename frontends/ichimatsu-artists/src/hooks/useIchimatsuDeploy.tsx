@@ -30,10 +30,10 @@ export const useIchimatsuDeploy = (): [
   } = useForm<DeployFormSchema>({
     resolver: yupResolver(deployFormSchema),
     defaultValues: {
-      name: "Ichimatsu NFT",
-      symbol: "INF",
+      name: "[EVENT NAME] NFT",
+      symbol: "ENF",
       royaltyRecipient: authSignInData ? authSignInData.eoa : "",
-      royaltyBps: 10,
+      royaltyBps: 1000,
     },
   });
 

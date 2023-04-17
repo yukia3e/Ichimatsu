@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import {
   CHAIN_NAMESPACES,
   WALLET_ADAPTERS,
@@ -29,6 +29,7 @@ const disconnectedHandler: Web3AuthEventListener = (data) => {
 };
 
 export const useAuth = (): [
+  boolean,
   (event: SyntheticEvent) => Promise<void>,
   (event: SyntheticEvent) => Promise<void>
 ] => {
@@ -39,12 +40,15 @@ export const useAuth = (): [
   const setProvider = useAuthStore((state) => state.setProvider);
   const setAuthSignInData = useAuthStore((state) => state.setAuthSignInData);
   const setTorusPlugin = useAuthStore((state) => state.setTorusPlugin);
+  const [isWaitingLoadAuth, setIsWaitingLoadAuth] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    setIsWaitingLoadAuth(true);
+
+    const init = async () => {
       const options: Web3AuthOptions = {
         clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "",
+        web3AuthNetwork: "testnet",
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
           chainId: process.env.NEXT_PUBLIC_CHAIN_ID || "",
@@ -113,7 +117,7 @@ export const useAuth = (): [
           whiteLabel: {
             name: "Ichimatsu",
             logoLight:
-              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png",
+              "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
             logoDark:
               "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },
@@ -131,7 +135,7 @@ export const useAuth = (): [
                 torusGray2: colors.white[500],
               },
             },
-            logoLight: `https://storage.cloud.google.com/ichimatsu-public/Ichimatsu.png`,
+            logoLight: `https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png`,
             logoDark:
               "https://storage.cloud.google.com/ichimatsu-public/Ichimatsu-bgw.png",
           },
@@ -153,12 +157,15 @@ export const useAuth = (): [
       setAuthKit(authKit);
       setTorusPlugin(torusPlugin);
 
+      setIsWaitingLoadAuth(false);
+
       return () => {
         authKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
         authKit.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
       };
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
+
+    init().catch(console.error);
   }, []);
 
   const login = async (event: SyntheticEvent) => {
@@ -185,12 +192,12 @@ export const useAuth = (): [
     }
 
     // TODO: torus-embed を消す
-    torusPlugin?.torusWalletInstance.hideTorusButton();
+    if (torusPlugin) torusPlugin.torusWalletInstance.hideTorusButton();
 
     await authKit.signOut();
     setProvider(null);
     setAuthSignInData(null);
   };
 
-  return [login, logout];
+  return [isWaitingLoadAuth, login, logout];
 };

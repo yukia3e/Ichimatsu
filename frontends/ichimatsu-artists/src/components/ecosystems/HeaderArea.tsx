@@ -8,7 +8,7 @@ type Props = {
 };
 
 const HeaderEcosystem: FC<Props> = ({ isForTop }) => {
-  const [_, logout] = useAuth();
+  const [_isWaitingLoadAuth, _login, logout] = useAuth();
   const provider = useAuthStore((state) => state.provider);
   const isLoggedIn = provider !== null;
 
