@@ -183,12 +183,13 @@ export const useAuth = (): [
 
       return;
     }
+
+    // TODO: torus-embed を消す
+    torusPlugin?.torusWalletInstance.hideTorusButton();
+
     await authKit.signOut();
     setProvider(null);
     setAuthSignInData(null);
-
-    // TODO: torus-embed を消す
-    await torusPlugin?.torusWalletInstance.logout();
   };
 
   return [login, logout];

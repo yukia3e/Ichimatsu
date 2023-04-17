@@ -15,7 +15,7 @@ const mintNFTs = async (
       contractAddress: nftContractAddress,
       to: artistAddress,
       quantity: quantity,
-      baseURI: `ipfs://${ipfsHash}`,
+      baseURI: `ipfs://${ipfsHash}/`,
       data: new Uint8Array(), // TODO: set data
     };
     const response = await fetch("/api/mint", {
