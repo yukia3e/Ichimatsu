@@ -197,13 +197,16 @@ const IchimatsuMintOrganism: FC = () => {
                   {...registerIPFSJSON("eventName", {
                     required: "EventName is required",
                   })}
+                  placeholder="e.g. 'ICHIMATSU TOUR 2023'"
                 />
-                {ipfsJSONErrors.eventName && (
-                  <span className="text-sm text-red-600 mt-2">
-                    {ipfsJSONErrors.eventName.message as string}
-                  </span>
-                )}
               </div>
+              {ipfsJSONErrors.eventName && (
+                <span className="text-sm text-red-600 mt-2">
+                  {ipfsJSONErrors.eventName.message as string}
+                </span>
+              )}
+            </div>
+            <div className="mb-4 px-4">
               <div className="flex flex-row justify-around my-4">
                 <label
                   htmlFor="eventDate"
@@ -218,11 +221,14 @@ const IchimatsuMintOrganism: FC = () => {
                   {...registerIPFSJSON("eventDate", {
                     required: "EventDate is required",
                   })}
+                  placeholder="e.g. '2023-04-16'"
                 />
-                {ipfsJSONErrors.eventDate && (
-                  <span>{ipfsJSONErrors.eventDate.message as string}</span>
-                )}
               </div>
+              {ipfsJSONErrors.eventDate && (
+                <span>{ipfsJSONErrors.eventDate.message as string}</span>
+              )}
+            </div>
+            <div className="mb-4 px-4">
               <div className="flex flex-row justify-around my-4">
                 <label
                   htmlFor="artistName"
@@ -236,12 +242,12 @@ const IchimatsuMintOrganism: FC = () => {
                   className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
                   {...registerIPFSJSON("artistName")}
                 />
-                {ipfsJSONErrors.artistName && (
-                  <span className="text-sm text-red-600 mt-2">
-                    {ipfsJSONErrors.artistName.message as string}
-                  </span>
-                )}
               </div>
+              {ipfsJSONErrors.artistName && (
+                <span className="text-sm text-red-600 mt-2">
+                  {ipfsJSONErrors.artistName.message as string}
+                </span>
+              )}
             </div>
             <Button
               design="primary"
@@ -275,6 +281,7 @@ const IchimatsuMintOrganism: FC = () => {
                   type="text"
                   className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
                   {...registerDeploy("name", { required: "Name is required" })}
+                  placeholder="e.g. 'My NFT'"
                 />
               </div>
               {deployErrors.name && (
@@ -298,10 +305,13 @@ const IchimatsuMintOrganism: FC = () => {
                   {...registerDeploy("symbol", {
                     required: "Symbol is required",
                   })}
+                  placeholder="e.g. 'MNF'"
                 />
               </div>
               {deployErrors.symbol && (
-                <span>{deployErrors.symbol.message as string}</span>
+                <span className="text-sm text-red-600 mt-2">
+                  {deployErrors.symbol.message as string}
+                </span>
               )}
             </div>
             <div className="mb-4 px-4">
@@ -319,6 +329,7 @@ const IchimatsuMintOrganism: FC = () => {
                   {...registerDeploy("royaltyRecipient", {
                     required: "Royalty Recipient is required",
                   })}
+                  placeholder="e.g. '0x1234...'"
                 />
               </div>
               {deployErrors.royaltyRecipient && (
@@ -327,21 +338,23 @@ const IchimatsuMintOrganism: FC = () => {
                 </span>
               )}
             </div>
-            <div className="flex flex-row justify-around my-4">
-              <label
-                htmlFor="royaltyBps"
-                className="block text-sm font-medium mx-4 my-auto w-1/3"
-              >
-                Royalty Bps
-              </label>
-              <input
-                id="royaltyBps"
-                type="number"
-                className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
-                {...registerDeploy("royaltyBps", {
-                  required: "Royalty Bps is required",
-                })}
-              />
+            <div className="mb-4 px-4">
+              <div className="flex flex-row justify-around my-4">
+                <label
+                  htmlFor="royaltyBps"
+                  className="block text-sm font-medium mx-4 my-auto w-1/3"
+                >
+                  Royalty Bps
+                </label>
+                <input
+                  id="royaltyBps"
+                  type="number"
+                  className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-primary-500 focus:ring-primary-500 file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4"
+                  {...registerDeploy("royaltyBps", {
+                    required: "Royalty Bps is required",
+                  })}
+                />
+              </div>
               {deployErrors.royaltyBps && (
                 <span className="text-sm text-red-600 mt-2">
                   {deployErrors.royaltyBps.message as string}
@@ -378,23 +391,24 @@ const IchimatsuMintOrganism: FC = () => {
       )}
       {/* trxAddress */}
       {txAddress && (
-        <div className="flex flex-col">
+        <div className="flex flex-col m-auto">
           <div className="w-full">
-            <span className="font-logo">Minted!!</span>
+            <span className="font-logo">Your Event NFT was Minted!!🎉</span>
           </div>
           <br />
           <div className="w-full">
             <span className="font-logo text-sm">
               trxAddress:
-              <br />
-              <a
-                href={`https://mumbai.polygonscan.com/tx/${txAddress}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {`${txAddress.slice(0, 5)}...${txAddress.slice(-5)}`}{" "}
+              <div className="flex justify-center m-auto flex-row gap-4">
+                <a
+                  href={`https://mumbai.polygonscan.com/tx/${txAddress}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {`${txAddress.slice(0, 5)}...${txAddress.slice(-5)}`}
+                </a>
                 <FaExternalLinkAlt />
-              </a>
+              </div>
             </span>
           </div>
         </div>
